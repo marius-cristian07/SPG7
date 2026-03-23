@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-
+using DanfossSPGroup7.Data;
 namespace DanfossSPGroup7
 {
     public partial class MainWindow : Window
@@ -7,6 +7,7 @@ namespace DanfossSPGroup7
         public MainWindow()
         {
             InitializeComponent();
+
         }
     }
 }
