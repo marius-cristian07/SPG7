@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 namespace DanfossSPGroup7.Data
 {
     public interface ISourceDataManager
-{
-    Dictionary<DateTime, DataPoint> LoadScenario(string fileName);
-}
+    {
+        public Dictionary<DateTime, DataPoint> LoadScenario(string fileName);
+        public Dictionary<DateTime, DataPoint> summer { get; }
+        public Dictionary<DateTime, DataPoint> winter { get; }
+    }
 }

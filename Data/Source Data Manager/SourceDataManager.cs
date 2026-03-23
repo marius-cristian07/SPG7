@@ -9,42 +9,42 @@ namespace DanfossSPGroup7.Data
 {
 
 
-public class SourceDataManager : ISourceDataManager
-{
-public Dictionary<DateTime, DataPoint> LoadScenario(string fileName)
-{
-    var data = new Dictionary<DateTime, DataPoint>();
-
-    foreach (var line in File.ReadLines(fileName).Skip(1))
+    public class SourceDataManager : ISourceDataManager
     {
-        var parts = line.Split(',');
 
-        var time = DateTime.Parse(parts[0]);
-        var heat = double.Parse(parts[1]);
-        var price = double.Parse(parts[2]);
+        public Dictionary<DateTime, DataPoint> summer { get; }
+        public Dictionary<DateTime, DataPoint> winter { get; }
 
-        data[time] = new DataPoint
+        public SourceDataManager()
         {
-            HeatDemand = heat,
-            ElectricityPrice = price
-        };
+            summer = LoadScenario("SummerSourceDataSheet.csv");
+            winter = LoadScenario("WinterSourceDataSheet.csv");
+        }
+        public Dictionary<DateTime, DataPoint> LoadScenario(string fileName)
+        {
+            Dictionary<DateTime, DataPoint> data = new Dictionary<DateTime, DataPoint>();
+
+            StreamReader reader = new StreamReader(fileName);
+            reader.ReadLine().Skip(1); 
+
+            while (!reader.EndOfStream)
+            {
+                string? line = reader.ReadLine();
+                string[] parts = line.Split(',');
+    
+                DateTime time = DateTime.Parse(parts[0]);
+                Double heat = double.Parse(parts[1]);
+                Double price = double.Parse(parts[2]);
+
+                data[time] = new DataPoint
+                {
+                    HeatDemand = heat,
+                    ElectricityPrice = price
+                };
+            }
+
+            return data;
+        }
     }
 
-    return data;
-}
-}
-
-
-
-/*            var manager = new SourceDataManager();
-
-                var winter = manager.LoadScenario("WinterSourceDataSheet.csv");
-                var summer = manager.LoadScenario("SummerSourceDataSheet.csv");
-
-                System.Console.WriteLine(winter.Count);
-                System.Console.WriteLine(summer.Count);
-
- This loads the data from the csv files and prints the number of entries in each scenario to the console.
- Not sure where to put it.
-*/
 }
