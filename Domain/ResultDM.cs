@@ -10,5 +10,7 @@ namespace DanfossSPGroup7.Domain
     {
         public ProductionUnit Unit { get; set; }
         public double NetProductionCost { get; set; }
+
+        public double HeatProduction { get; set; }
     }
 }
