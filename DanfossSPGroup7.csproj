@@ -17,6 +17,15 @@
       <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
+
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1" />
+
+  <None Update="Source Data Manager\SummerSourceDataSheet.csv">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  <None Update="Source Data Manager\WinterSourceDataSheet.csv">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+
   </ItemGroup>
 </Project>

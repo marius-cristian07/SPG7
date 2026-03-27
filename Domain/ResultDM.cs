@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +8,9 @@ namespace DanfossSPGroup7.Domain
 {
     internal class ResultDM
     {
+        public ProductionUnit Unit { get; set; }
+        public double NetProductionCost { get; set; }
+
+        public double HeatProduction { get; set; }
     }
 }
