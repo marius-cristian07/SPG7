@@ -10,7 +10,7 @@ public partial class MainViewModel : ObservableObject
 
     public MainViewModel()
     {
-        CurrentViewModel = new DashboardViewModel();
+        CurrentViewModel = new AssetViewModel();
     }
 
     [RelayCommand]
