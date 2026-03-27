@@ -1,0 +1,14 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DanfossSPGroup7.UI.ViewModels"
+             x:Class="DanfossSPGroup7.UI.Views.ResultView"
+             x:DataType="vm:ResultViewModel"
+             Background="White">
+  <Border Padding="20">
+    <StackPanel Spacing="10">
+      <TextBlock Text="Data Visualization" FontSize="18" FontWeight="Bold" />
+      <TextBlock Text="CO2 Chart Placeholder" FontSize="14" />
+      <TextBlock Text="Cost Chart Placeholder" FontSize="14" />
+    </StackPanel>
+  </Border>
+</UserControl>

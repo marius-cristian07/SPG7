@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:DanfossSPGroup7.UI.ViewModels"
+        x:Class="DanfossSPGroup7.UI.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="Heat Production Optimization"
+        Width="1000"
+        Height="600">
+
+    <Window.Styles>
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Window.Styles>
+
+    <!-- Two Columns -->
+    <Grid ColumnDefinitions="200,*">
+
+    <!-- Sidebar, column 0 -->
+    <StackPanel Grid.Column="0" Background="#BA0303">
+
+        <Border Height="60" Background="#881717" Padding="15" HorizontalAlignment="Stretch">
+        <TextBlock Foreground="#FFFFFF" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" TextAlignment="Center">HeatItOn</TextBlock>
+        </Border>
+        
+        <Button Foreground="#FFFFFF" FontSize="19" VerticalContentAlignment="Center" Padding="20,0" Height="60" HorizontalAlignment="Stretch" Content="Asset Manager" Command="{Binding NavigateCommand}" CommandParameter="Asset" Margin="0,3,0,0" />
+        <Button Foreground="#FFFFFF" FontSize="19" VerticalContentAlignment="Center" Padding="20,0" Height="60" HorizontalAlignment="Stretch" Content="Data" Command="{Binding NavigateCommand}" CommandParameter="Dashboard" />
+        <Button Foreground="#FFFFFF" FontSize="19" VerticalContentAlignment="Center" Padding="20,0" Height="60" HorizontalAlignment="Stretch" Content="Results" Command="{Binding NavigateCommand}" CommandParameter="Result" />
+
+    </StackPanel>
+
+    <!-- Content Area, column 1 -->
+        <Grid Grid.Column="1" RowDefinitions="Auto, *">
+            <!-- Row 0 -->
+            <Border Grid.Row="0" 
+                    Background="#BA0303" 
+                    Height="63" 
+                    HorizontalAlignment="Stretch"
+                    Padding="20,0">
+                <TextBlock Text="Danfoss Heat Optimization System" 
+                        Foreground="White" 
+                        FontSize="22" 
+                        FontWeight="Bold"
+                        VerticalAlignment="Center"/>
+            </Border>
+            <!-- Row 1 -->
+            <ContentControl Grid.Row="1"  Content="{Binding CurrentViewModel}" />
+        </Grid>
+    </Grid>
+</Window>
