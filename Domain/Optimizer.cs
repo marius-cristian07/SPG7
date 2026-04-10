@@ -29,7 +29,7 @@ namespace DanfossSPGroup7.Domain
             }
 
             return _productionUnits
-                .Where(unit => !unit.IsInMaintenance)
+                .Where(u => u.IsAvailable(dateTime))
                 .Select(unit => new ResultDM
                 {
                     Unit = unit,
@@ -61,7 +61,7 @@ namespace DanfossSPGroup7.Domain
             {
                 double demand = kvp.Value.HeatDemand;
                 var orderedUnits = _productionUnits
-                    .Where(u => !u.IsInMaintenance)
+                    .Where(u => u.IsAvailable(kvp.Key))
                     .OrderBy(u => u.ProductionCost) 
                     .ToList();
 
@@ -93,7 +93,7 @@ namespace DanfossSPGroup7.Domain
                 double price = kvp.Value.ElectricityPrice;
 
                 var orderedUnits = _productionUnits
-                    .Where(u => !u.IsInMaintenance)
+                    .Where(u => u.IsAvailable(kvp.Key))
                     .Select(u => new { Unit = u, Cost = CalculateNetProductionCost(u, price) })
                     .OrderBy(x => x.Cost)
                     .ToList();
@@ -115,3 +115,4 @@ namespace DanfossSPGroup7.Domain
         }
     }
 }
+

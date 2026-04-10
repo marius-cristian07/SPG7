@@ -14,12 +14,13 @@ namespace DanfossSPGroup7.Data
 
         public Dictionary<DateTime, DataPoint> summer { get; }
         public Dictionary<DateTime, DataPoint> winter { get; }
-
+        // Loading Data from the file
         public SourceDataManager()
         {
             summer = LoadScenario("SummerSourceDataSheet.csv");
             winter = LoadScenario("WinterSourceDataSheet.csv");
         }
+        // Logic behind loading the Data
         public Dictionary<DateTime, DataPoint> LoadScenario(string fileName)
         {
             Dictionary<DateTime, DataPoint> data = new Dictionary<DateTime, DataPoint>();
@@ -30,6 +31,7 @@ namespace DanfossSPGroup7.Data
             while (!reader.EndOfStream)
             {
                 string? line = reader.ReadLine();
+                if (line == null) break;  // Statt nur Split
                 string[] parts = line.Split(',');
     
                 DateTime time = DateTime.Parse(parts[0]);
