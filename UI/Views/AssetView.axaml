@@ -3,12 +3,82 @@
              xmlns:vm="using:DanfossSPGroup7.UI.ViewModels"
              x:Class="DanfossSPGroup7.UI.Views.AssetView"
              x:DataType="vm:AssetViewModel"
-             Background="White">
+             Background="White"
+             x:Name="Root">
+
+  <!-- General styles for the button -->
+  <UserControl.Styles>
+    <Style Selector="Button">
+      <Setter Property="Background" Value="#B2151B" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <Style Selector="Button:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#820F13" /> 
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+
+  </UserControl.Styles>
+
   <Border Padding="20">
-    <StackPanel Spacing="10">
-      <TextBlock Text="Scenario 1: Production Units" FontSize="18" FontWeight="Bold" />
-      <TextBlock Text="3 Gas Boilers" FontSize="14" />
-      <TextBlock Text="1 Oil Boiler" FontSize="14" />
+    
+  <Grid RowDefinitions= "Auto, *">
+
+    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="15" Margin="0, 0, 10, 20">
+      <Button FontSize="17" VerticalContentAlignment="Center" Padding="10,0" Height="40" HorizontalAlignment="Stretch"
+              Content="Scenario 1" Command="{Binding SwitchScenarioCommand}" CommandParameter="1"/>
+      <Button FontSize="17" VerticalContentAlignment="Center" Padding="10,0" Height="40" HorizontalAlignment="Stretch"
+              Content="Scenario 2" Command="{Binding SwitchScenarioCommand}" CommandParameter="2"/>
     </StackPanel>
+
+    <ScrollViewer Grid.Row="1">
+      <ItemsControl ItemsSource="{Binding DisplayUnits}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Border Background="#E0E0E0" Margin="10,5" Padding="15" CornerRadius="4">
+              <Grid ColumnDefinitions="120, *, 200">
+
+                <StackPanel Grid.Column="0">
+                  <Border Width="80" Height="80" Background="White" Margin="0,0,0,5" />
+                  <TextBlock Text="{Binding Unit.Name}" FontWeight="Bold" HorizontalAlignment="Center" />
+                </StackPanel>
+
+                <Grid Grid.Column="1" ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto" VerticalAlignment="Center">
+                  <TextBlock Grid.Row="0" Grid.Column="0" Text="Produced Heat" FontSize="10" Foreground="Gray"/>
+                  <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Unit.MaxHeatMW, StringFormat='{}{0} MW'}"/>
+                  
+                  <TextBlock Grid.Row="0" Grid.Column="1" Text="Prod. Cost" FontSize="10" Foreground="Gray"/>
+                  <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Unit.ProductionCost, StringFormat='{}{0} DKK'}"/>
+
+                  <TextBlock Grid.Row="0" Grid.Column="2" Text="CO2" FontSize="10" Foreground="Gray"/>
+                  <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Unit.CO2Emissions, StringFormat='{}{0} kg'}"/>
+                </Grid>
+
+                <StackPanel Grid.Column="2" Spacing="5" VerticalAlignment="Center">
+
+                  <CheckBox Content="Include in Optimizer"
+                            IsChecked="{Binding IsActive}"
+                            IsVisible="{Binding IsScenario2}"/>
+
+                  <CheckBox Content="Maintenance Mode" 
+                            IsChecked="{Binding IsSelectedForMaintenance}"
+                            IsEnabled="{Binding CanToggleMaintenance}"
+                            Command="{Binding #Root.DataContext.HandleMaintenanceChangeCommand}"/>
+                  <StackPanel IsVisible="{Binding IsSelectedForMaintenance}">
+                    <Slider Minimum="30" Maximum="60" Value="{Binding MaintenanceDuration}" />
+                    <TextBlock Text="{Binding MaintenanceDuration, StringFormat='{}{0} Hours'}" FontSize="10" HorizontalAlignment="Right"/>
+                  </StackPanel>
+
+                </StackPanel>
+
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+
+  </Grid>
+  
   </Border>
 </UserControl>
