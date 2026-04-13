@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36518.9
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DanfossSPGroup7", "DanfossSPGroup7.csproj", "{892FFE4B-D5F3-4B18-954D-603D8F8207A0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DanfossSPGroup7", "DanfossSPGroup7\DanfossSPGroup7.csproj", "{892FFE4B-D5F3-4B18-954D-603D8F8207A0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DanfossSPGroup7.Tests", "DanfossSPGroup7.Tests\DanfossSPGroup7.Tests.csproj", "{DE10EE01-5B8F-461A-B3AB-6DD0986C1535}"
 EndProject
