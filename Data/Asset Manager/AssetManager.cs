@@ -19,8 +19,7 @@ namespace DanfossSPGroup7.Data
                 ElectricityMW = 0,
                 EnergyConsumption = 1.05,
                 ProductionCost = 510,
-                CO2Emissions = 132,
-                IsInMaintenance = false
+                CO2Emissions = 132
             },
             new ProductionUnit
             {
@@ -30,8 +29,7 @@ namespace DanfossSPGroup7.Data
                 ElectricityMW = 0,
                 EnergyConsumption = 1.08,
                 ProductionCost = 540,
-                CO2Emissions = 134,
-                IsInMaintenance = false
+                CO2Emissions = 134
             },
             new ProductionUnit
             {
@@ -41,8 +39,7 @@ namespace DanfossSPGroup7.Data
                 ElectricityMW = 0,
                 EnergyConsumption = 1.09,
                 ProductionCost = 580,
-                CO2Emissions = 136,
-                IsInMaintenance = false
+                CO2Emissions = 136
             },
             new ProductionUnit
             {
@@ -52,8 +49,7 @@ namespace DanfossSPGroup7.Data
                 ElectricityMW = 0,
                 EnergyConsumption = 1.18,
                 ProductionCost = 690,
-                CO2Emissions = 147,
-                IsInMaintenance = false
+                CO2Emissions = 147
             },
             new ProductionUnit
             {
@@ -63,8 +59,7 @@ namespace DanfossSPGroup7.Data
                 ElectricityMW = 3.9,
                 EnergyConsumption = 1.82,
                 ProductionCost = 975,
-                CO2Emissions = 227,
-                IsInMaintenance = false
+                CO2Emissions = 227
             },
             new ProductionUnit
             {
@@ -74,8 +69,7 @@ namespace DanfossSPGroup7.Data
                 ElectricityMW = -6.0,
                 EnergyConsumption = 0,
                 ProductionCost = 15,
-                CO2Emissions = 0,
-                IsInMaintenance = false
+                CO2Emissions = 0
             }
 
         };
