@@ -31,8 +31,6 @@ namespace DanfossSPGroup7.Domain
 
         public void ScheduleMaintenance(MaintenancePeriod period)
         {
-            if (_maintenancePeriods.Any(m => m.Overlaps(period)))
-                throw new InvalidOperationException($"Maintenance period overlaps with existing maintenance for unit {Name}");
 
             _maintenancePeriods.Add(period);
         }
