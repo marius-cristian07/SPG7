@@ -5,7 +5,7 @@ using DanfossSPGroup7.Data;
 
 namespace DanfossSPGroup7.Domain
 {
-    internal class Optimizer
+    public class Optimizer
     {
         public static Optimizer? Instance { get; private set; }
         public Dictionary<DateTime, DataPoint> Summer { get; private set; }
@@ -39,7 +39,7 @@ namespace DanfossSPGroup7.Domain
                 .ToList();
         }
 
-        private static double CalculateNetProductionCost(ProductionUnit unit, double electricityPrice)
+        public static double CalculateNetProductionCost(ProductionUnit unit, double electricityPrice)
         {
             if (unit.MaxHeatMW <= 0)
             {
