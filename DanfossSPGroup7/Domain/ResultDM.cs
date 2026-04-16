@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DanfossSPGroup7.Domain
 {
-    internal class ResultDM
+    public class ResultDM
     {
         public ProductionUnit Unit { get; set; }
         public double NetProductionCost { get; set; }
