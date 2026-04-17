@@ -1,0 +1,169 @@
+% ============================================================
+% SDU Project Report Template
+% ============================================================
+\documentclass[12pt, a4paper]{report}
+
+% --- Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{fancyhdr}
+\usepackage{lipsum}     % Remove in final report (used for placeholder text)
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{lmodern}
+\usepackage{xcolor}
+\usepackage{listings}   % For code listings if needed
+
+% --- Page Geometry ---
+\geometry{
+    a4paper,
+    top=2.5cm,
+    bottom=2.5cm,
+    left=3cm,
+    right=2.5cm
+}
+
+% --- Line Spacing ---
+\onehalfspacing
+
+% --- Header / Footer ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Hyperlink Setup ---
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    citecolor=black
+}
+
+% ============================================================
+% FRONT PAGE
+% ============================================================
+\begin{document}
+
+\begin{titlepage}
+    \centering
+
+    % SDU Logo — replace path with actual logo file
+    \includegraphics[width=0.8\textwidth]{Images/SDU-logo-sort.png}\\[2cm]
+
+    {\Huge \textbf{Project Name}}\\[0.5cm]
+    {\large Semester X, Year XXXX}\\[2cm]
+
+    \begin{tabular}{ll}
+        \textbf{Students:} & Student Name 1 \quad \texttt{stud1@student.sdu.dk} \\
+                           & Student Name 2 \quad \texttt{stud2@student.sdu.dk} \\
+                           & Student Name 3 \quad \texttt{stud3@student.sdu.dk} \\[0.5cm]
+        \textbf{Supervisor:} & Supervisor Name \\[0.3cm]
+        \textbf{Lecturers:} & Lecturer Name 1 \\
+                            & Lecturer Name 2 \\
+    \end{tabular}
+
+    \vfill
+    {\large University of Southern Denmark}\\
+    {\large \today}
+\end{titlepage}
+
+% ============================================================
+% FRONT MATTER (not counted in written page count)
+% ============================================================
+
+% --- Table of Contents ---
+\pagenumbering{roman}
+\tableofcontents
+\newpage
+
+% --- List of Figures ---
+\listoffigures
+\newpage
+
+% --- List of Tables / Diagrams ---
+\listoftables
+\newpage
+
+% --- Abstract ---
+\chapter*{Abstract}
+\input{Chapters/Abstract}
+
+\newpage
+\pagenumbering{arabic}
+
+% ============================================================
+% CHAPTER 1 — INTRODUCTION
+% ============================================================
+\chapter{Introduction}
+\input{Chapters/Introduction}
+
+% ============================================================
+% CHAPTER 2 — SCRUM IMPLEMENTATION
+% ============================================================
+\chapter{Scrum Implementation}
+\input{Chapters/ScrumImplementation}
+
+% ============================================================
+% CHAPTER 3 — SPRINTS
+% ============================================================
+\chapter{Sprints}
+\input{Chapters/Sprints}
+
+% ============================================================
+% CHAPTER 4 — SOLUTION (TECHNICAL ASPECT)
+% ============================================================
+\chapter{Solution (Technical Aspect)}
+\input{Chapters/Solution}
+
+% ============================================================
+% CHAPTER 5 — IMPLEMENTATION AND TECHNICAL REALIZATION
+% ============================================================
+\chapter{Implementation and Technical Realization}
+\input{Chapters/Implementation}
+
+% ============================================================
+% CHAPTER 6 — DISCUSSION & REFLECTION
+% ============================================================
+\chapter{Discussion \& Reflection}
+\input{Chapters/Reflection}
+
+% ============================================================
+% CHAPTER 7 — CONCLUSION
+% ============================================================
+\chapter{Conclusion}
+\input{Chapters/Conclusion}
+
+
+% ============================================================
+% REFERENCES (not counted in written page count)
+% ============================================================
+\chapter*{References}
+\input{Chapters/References}
+
+% ============================================================
+% AI USAGE (not counted in written page count)
+% ============================================================
+\chapter*{AI Usage}
+\input{Chapters/AIUsage}
+
+
+% ============================================================
+% APPENDIX (not counted in written page count)
+% ============================================================
+\appendix
+\input{Chapters/Appendix}
+
+\end{document}
