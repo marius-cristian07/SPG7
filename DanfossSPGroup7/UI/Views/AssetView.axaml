@@ -62,8 +62,7 @@
 
                   <CheckBox Content="Maintenance Mode" 
                             IsChecked="{Binding IsSelectedForMaintenance}"
-                            IsEnabled="{Binding CanToggleMaintenance}"
-                            Command="{Binding #Root.DataContext.HandleMaintenanceChangeCommand}"/>
+                            IsEnabled="{Binding CanToggleMaintenance}" />
                   <StackPanel IsVisible="{Binding IsSelectedForMaintenance}">
                     <Slider Minimum="30" Maximum="60" Value="{Binding MaintenanceDuration}" />
                     <TextBlock Text="{Binding MaintenanceDuration, StringFormat='{}{0} Hours'}" FontSize="10" HorizontalAlignment="Right"/>

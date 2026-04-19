@@ -13,11 +13,8 @@ public partial class AssetViewModel : ObservableObject
 {
     private readonly AssetManager _dataService = new AssetManager();
 
-    [ObservableProperty]
-    private int _selectedScenario = 1; // make the default scenario 1
-
-    [ObservableProperty]
-    private ObservableCollection<UnitConfigViewModel> _displayUnits = new ObservableCollection<UnitConfigViewModel>();
+    [ObservableProperty] private int _selectedScenario = 1; // make the default scenario 1
+    [ObservableProperty] private ObservableCollection<UnitConfigViewModel> _displayUnits = new();
 
     public AssetViewModel()
     {
@@ -41,19 +38,16 @@ public partial class AssetViewModel : ObservableObject
         foreach (var unit in DisplayUnits)
         {
             if (selectedUnit == null)
-            {
                 unit.CanToggleMaintenance = true;
-            }
             else
-            {
-                unit.CanToggleMaintenance = (unit == selectedUnit);
-            }
+                unit.CanToggleMaintenance = unit == selectedUnit;
         }
     }
 
     public void LoadScenario(int scenario)
     {
         DisplayUnits.Clear();
+
         var allUnits = _dataService.GetProductionUnits();
         IEnumerable<ProductionUnit> selectedUnits;
 
@@ -67,7 +61,6 @@ public partial class AssetViewModel : ObservableObject
             //Scenario 2 - (GM1, EB1, GB1, GB3)
             selectedUnits = allUnits.Where(unit => new[] { "GM1", "EB1", "GB1", "GB3" }.Contains(unit.Name));
         }
-
 
         foreach (var unit in selectedUnits)
         {
@@ -90,6 +83,8 @@ public partial class AssetViewModel : ObservableObject
     }
 
 
+
+
     public partial class UnitConfigViewModel : ObservableObject
     {
         public ProductionUnit Unit {get; set;}
@@ -100,5 +95,29 @@ public partial class AssetViewModel : ObservableObject
         [ObservableProperty] private int _maintenanceDuration = 30; // by default we select the minimum
 
         public UnitConfigViewModel(ProductionUnit unit) => Unit = unit;
+    }
+
+
+    // Maintenance call
+    public void PassMaintenanceData(int hours, string unitName)
+    {
+        Console.WriteLine($"Sent to Optimizer: {unitName} for {hours} hours.");
+        // fill actual maintennace call from my teams code
+    }
+
+    [RelayCommand]
+    public void PrepareOptimization()
+    {
+        // finds the unit where the user checked the maintenance box
+        var selectedUnit = DisplayUnits.FirstOrDefault(u => u.IsSelectedForMaintenance);
+
+        if(selectedUnit != null)
+        {
+            PassMaintenanceData(selectedUnit.MaintenanceDuration, selectedUnit.Unit.Name);
+        }
+        else
+        {
+            // do something if no maintenance is selected
+        }
     }
 }
