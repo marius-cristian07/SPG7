@@ -4,10 +4,30 @@
              x:Class="DanfossSPGroup7.UI.Views.DashboardView"
              x:DataType="vm:DashboardViewModel"
              Background="White">
-  <Border Padding="20">
-    <StackPanel Spacing="10">
-      <TextBlock Text="City Map" FontSize="18" FontWeight="Bold" />
-      <TextBlock Text="Heat distribution network map will be displayed here" FontSize="14" />
+
+  <StackPanel Margin="20" Spacing="10">
+        <TextBlock Text="Unit Specifications" FontSize="24" FontWeight="Bold" Foreground="#BA121A" Margin="0,0,0,10"/>
+
+        <Border Background="#F5F5F5" BorderBrush="#DCDCDC" BorderThickness="1" Padding="10">
+            <Grid ColumnDefinitions="2*, 1*, 1*, 1*">
+                <TextBlock Grid.Column="0" Text="Boiler Name" FontWeight="Bold"/>
+                <TextBlock Grid.Column="1" Text="Max Heat (MW)" FontWeight="Bold"/>
+                <TextBlock Grid.Column="2" Text="Fuel Cost" FontWeight="Bold"/>
+                <TextBlock Grid.Column="3" Text="CO2 Emission" FontWeight="Bold"/>
+            </Grid>
+        </Border>
+
+        <ListBox ItemsSource="{Binding AllUnits}" Background="Transparent">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid ColumnDefinitions="2*, 1*, 1*, 1*" Margin="10,5">
+                        <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="{Binding MaxHeatMW}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="{Binding ProductionCost}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="3" Text="{Binding CO2Emissions}" VerticalAlignment="Center"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </StackPanel>
-  </Border>
 </UserControl>

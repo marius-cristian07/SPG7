@@ -20,12 +20,14 @@
 
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1" />
 
-  <None Update="Source Data Manager\SummerSourceDataSheet.csv">
+  <None Include="Data\Source Data Manager\SummerSourceDataSheet.csv">
     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
   </None>
-  <None Update="Source Data Manager\WinterSourceDataSheet.csv">
+  <None Include="Data\Source Data Manager\WinterSourceDataSheet.csv">
     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
   </None>
+  <PackageReference Include="LiveChartsCore" Version="2.0.0-rc2" />
+  <PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc2" />
 
   </ItemGroup>
 </Project>

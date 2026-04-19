@@ -29,6 +29,11 @@ namespace DanfossSPGroup7.Domain
             return true;
         }
 
+        public void ClearMaintenance()
+        {
+            _maintenancePeriods.Clear();
+        }
+
         public void ScheduleMaintenance(MaintenancePeriod period)
         {
             if (_maintenancePeriods.Any(m => m.Overlaps(period)))

@@ -11,6 +11,7 @@ namespace DanfossSPGroup7.Domain
         public Dictionary<DateTime, DataPoint> Summer { get; private set; }
         public Dictionary<DateTime, DataPoint> Winter { get; private set; }
         private readonly List<ProductionUnit> _productionUnits;
+        public List<ProductionUnit> ProductionUnits => _productionUnits;
 
         public Optimizer(ISourceDataManager sourceDataManager, IAssetManager assetManager)
         {
@@ -52,16 +53,19 @@ namespace DanfossSPGroup7.Domain
         }
 
         // Scenario 1
-        public List<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW)> Schedule)> RunScenario1(bool isSummer)
+        public List<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW)> Schedule)> RunScenario1(bool isSummer, IEnumerable<string>? allowedUnitNames = null)
         {
             var dict = isSummer ? Summer : Winter;
             var results = new List<(DateTime, List<(ProductionUnit, double)>)>();
+
+            var allowedSet = allowedUnitNames != null ? new HashSet<string>(allowedUnitNames): null;
 
             foreach (var kvp in dict)
             {
                 double demand = kvp.Value.HeatDemand;
                 var orderedUnits = _productionUnits
                     .Where(u => u.IsAvailable(kvp.Key))
+                    .Where(u => allowedSet == null || allowedSet.Contains(u.Name))
                     .OrderBy(u => u.ProductionCost) 
                     .ToList();
 

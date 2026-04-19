@@ -11,10 +11,12 @@ namespace DanfossSPGroup7.UI.ViewModels;
 
 public partial class AssetViewModel : ObservableObject
 {
-    private readonly AssetManager _dataService = new AssetManager();
 
+    private readonly MaintenanceCalculation _calculator = new MaintenanceCalculation();
+    private readonly AssetManager _dataService = new AssetManager();
     [ObservableProperty] private int _selectedScenario = 1; // make the default scenario 1
     [ObservableProperty] private ObservableCollection<UnitConfigViewModel> _displayUnits = new();
+    [ObservableProperty] private bool _isSummer = false;
 
     public AssetViewModel()
     {
@@ -64,7 +66,7 @@ public partial class AssetViewModel : ObservableObject
 
         foreach (var unit in selectedUnits)
         {
-            DisplayUnits.Add(new UnitConfigViewModel(unit)
+            DisplayUnits.Add(new UnitConfigViewModel(unit, this)
             {
                 //Scenario 1 - all units are activated and cannot be deactivated unless for maintenance
                 //Scenario 2 - by defaul the units are activated but can be toggled to see different combinations
@@ -82,11 +84,19 @@ public partial class AssetViewModel : ObservableObject
         return DisplayUnits.Any(unit => !unit.IsActive);
     }
 
-
+    public List<string> GetSelectedUnitNames()
+    {
+        return DisplayUnits
+            .Where(unit => unit.IsActive)
+            .Select(unit => unit.Unit.Name)
+            .ToList();
+    }
 
 
     public partial class UnitConfigViewModel : ObservableObject
     {
+        private AssetViewModel? _parent;
+
         public ProductionUnit Unit {get; set;}
         [ObservableProperty] private bool _isActive;
         [ObservableProperty] private bool _isScenario2;
@@ -94,30 +104,51 @@ public partial class AssetViewModel : ObservableObject
         [ObservableProperty] private bool _canToggleMaintenance = true; // default for every unit
         [ObservableProperty] private int _maintenanceDuration = 30; // by default we select the minimum
 
-        public UnitConfigViewModel(ProductionUnit unit) => Unit = unit;
+        public UnitConfigViewModel(ProductionUnit unit, AssetViewModel? parent = null) 
+        { 
+            Unit = unit;
+            _parent = parent;
+        }
+
+        partial void OnIsSelectedForMaintenanceChanged(bool value)
+        {
+            // Notify parent to update maintenance lock when checkbox changes
+            _parent?.HandleMaintenanceChange();
+        }
     }
 
-
-    // Maintenance call
-    public void PassMaintenanceData(int hours, string unitName)
-    {
-        Console.WriteLine($"Sent to Optimizer: {unitName} for {hours} hours.");
-        // fill actual maintennace call from my teams code
-    }
 
     [RelayCommand]
     public void PrepareOptimization()
-    {
-        // finds the unit where the user checked the maintenance box
-        var selectedUnit = DisplayUnits.FirstOrDefault(u => u.IsSelectedForMaintenance);
+    {   
+        if (Optimizer.Instance == null)
+            return;
 
-        if(selectedUnit != null)
+        // reset all previous maintenance every time results are recalculated
+        foreach (var unit in Optimizer.Instance.ProductionUnits)
         {
-            PassMaintenanceData(selectedUnit.MaintenanceDuration, selectedUnit.Unit.Name);
+            unit.ClearMaintenance();
         }
-        else
+
+        // finds the unit where the user checked the maintenance box
+        var selectedUnit = DisplayUnits.FirstOrDefault(unit => unit.IsSelectedForMaintenance);
+
+        if(selectedUnit == null)
+            return;
+        if(Optimizer.Instance == null)
+            return;
+        try
         {
-            // do something if no maintenance is selected
+
+            _calculator.CreateMaintenanceForBoiler(
+                selectedUnit.Unit.Name,
+                selectedUnit.MaintenanceDuration,
+                Optimizer.Instance.ProductionUnits
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR: {ex.Message}");
         }
     }
 }

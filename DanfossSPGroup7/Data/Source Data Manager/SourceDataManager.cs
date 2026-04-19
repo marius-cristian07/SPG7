@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
 using System.IO;
 
 namespace DanfossSPGroup7.Data
@@ -17,26 +15,50 @@ namespace DanfossSPGroup7.Data
         // Loading Data from the file
         public SourceDataManager()
         {
-            summer = LoadScenario("SummerSourceDataSheet.csv");
-            winter = LoadScenario("WinterSourceDataSheet.csv");
+            string basePath = AppContext.BaseDirectory;
+
+            string summerPath = ResolveSourceDataPath(basePath, "SummerSourceDataSheet.csv");
+            string winterPath = ResolveSourceDataPath(basePath, "WinterSourceDataSheet.csv");
+
+            summer = LoadScenario(summerPath);
+            winter = LoadScenario(winterPath);
         }
+
+        private static string ResolveSourceDataPath(string basePath, string fileName)
+        {
+            string rootPath = Path.Combine(basePath, fileName);
+            if (File.Exists(rootPath))
+                return rootPath;
+
+            string nestedPath = Path.Combine(basePath, "Data", "Source Data Manager", fileName);
+            if (File.Exists(nestedPath))
+                return nestedPath;
+
+            throw new FileNotFoundException($"CSV file not found: {fileName}. Tried: {rootPath} and {nestedPath}");
+        }
+
         // Logic behind loading the Data
         public Dictionary<DateTime, DataPoint> LoadScenario(string fileName)
         {
-            Dictionary<DateTime, DataPoint> data = new Dictionary<DateTime, DataPoint>();
+            if (!File.Exists(fileName))
+                throw new FileNotFoundException($"CSV file not found: {fileName}");
 
-            StreamReader reader = new StreamReader(fileName);
-            reader.ReadLine().Skip(1); 
+            Dictionary<DateTime, DataPoint> data = new();
+
+            using StreamReader reader = new StreamReader(fileName);
+
+            reader.ReadLine(); // skip header
 
             while (!reader.EndOfStream)
             {
                 string? line = reader.ReadLine();
-                if (line == null) break;  // Statt nur Split
+                if (string.IsNullOrWhiteSpace(line)) continue;
+
                 string[] parts = line.Split(',');
-    
-                DateTime time = DateTime.Parse(parts[0]);
-                Double heat = double.Parse(parts[1]);
-                Double price = double.Parse(parts[2]);
+
+                DateTime time = DateTime.Parse(parts[0], CultureInfo.InvariantCulture);
+                double heat = double.Parse(parts[1], CultureInfo.InvariantCulture);
+                double price = double.Parse(parts[2], CultureInfo.InvariantCulture);
 
                 data[time] = new DataPoint
                 {

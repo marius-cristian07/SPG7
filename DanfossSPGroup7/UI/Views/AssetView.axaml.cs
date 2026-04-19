@@ -8,6 +8,5 @@ public partial class AssetView : UserControl
     public AssetView()
     {
         InitializeComponent();
-        DataContext = new AssetViewModel();
     }
 }

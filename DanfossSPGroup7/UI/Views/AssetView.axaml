@@ -29,6 +29,8 @@
               Content="Scenario 1" Command="{Binding SwitchScenarioCommand}" CommandParameter="1"/>
       <Button FontSize="17" VerticalContentAlignment="Center" Padding="10,0" Height="40" HorizontalAlignment="Stretch"
               Content="Scenario 2" Command="{Binding SwitchScenarioCommand}" CommandParameter="2"/>
+      <CheckBox Content="Click for summer / leave for winter"
+          IsChecked="{Binding IsSummer}" />
     </StackPanel>
 
     <ScrollViewer Grid.Row="1">
