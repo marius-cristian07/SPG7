@@ -53,10 +53,10 @@ namespace DanfossSPGroup7.Domain
         }
 
         // Scenario 1
-        public List<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW)> Schedule)> RunScenario1(bool isSummer, IEnumerable<string>? allowedUnitNames = null)
+        public List<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)> RunScenario1(bool isSummer, IEnumerable<string>? allowedUnitNames = null)
         {
             var dict = isSummer ? Summer : Winter;
-            var results = new List<(DateTime, List<(ProductionUnit, double)>)>();
+            var results = new List<(DateTime, List<(ProductionUnit, double, double)>)>();
 
             var allowedSet = allowedUnitNames != null ? new HashSet<string>(allowedUnitNames): null;
 
@@ -69,14 +69,14 @@ namespace DanfossSPGroup7.Domain
                     .OrderBy(u => u.ProductionCost) 
                     .ToList();
 
-                var schedule = new List<(ProductionUnit, double)>();
+                var schedule = new List<(ProductionUnit, double, double)>();
 
                 foreach (var unit in orderedUnits)
                 {
                     if (demand <= 0) break;
 
                     var heat = Math.Min(unit.MaxHeatMW, demand);
-                    schedule.Add((unit, heat));
+                    schedule.Add((unit, heat, unit.CO2Emissions));
                     demand -= heat;
                 }
 
@@ -86,10 +86,10 @@ namespace DanfossSPGroup7.Domain
         }
 
         // Scenario 2
-        public List<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW)> Schedule)> RunScenario2(bool isSummer)
+        public List<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)> RunScenario2(bool isSummer)
         {
             var dict = isSummer ? Summer : Winter;
-            var results = new List<(DateTime, List<(ProductionUnit, double)>)>();
+            var results = new List<(DateTime, List<(ProductionUnit, double, double)>)>();
 
             foreach (var kvp in dict)
             {
@@ -102,14 +102,14 @@ namespace DanfossSPGroup7.Domain
                     .OrderBy(x => x.Cost)
                     .ToList();
 
-                var schedule = new List<(ProductionUnit, double)>();
+                var schedule = new List<(ProductionUnit, double, double)>();
 
                 foreach (var item in orderedUnits)
                 {
                     if (demand <= 0) break;
 
                     var heat = Math.Min(item.Unit.MaxHeatMW, demand);
-                    schedule.Add((item.Unit, heat));
+                    schedule.Add((item.Unit, heat, item.Unit.CO2Emissions));
                     demand -= heat;
                 }
 
