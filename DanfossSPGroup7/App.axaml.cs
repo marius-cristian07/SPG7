@@ -22,19 +22,14 @@ namespace DanfossSPGroup7
             {
                 if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
                 {
-                    Console.WriteLine("APP START");
 
                     var dataManager = new SourceDataManager();
-                    Console.WriteLine("DATA LOADED");
 
                     var assetManager = new AssetManager();
-                    Console.WriteLine("ASSETS LOADED");
 
                     new Optimizer(dataManager, assetManager);
-                    Console.WriteLine("OPTIMIZER CREATED");
 
                     desktop.MainWindow = new MainWindow();
-                    Console.WriteLine("MAIN WINDOW CREATED");
                 }
 
                 base.OnFrameworkInitializationCompleted();
