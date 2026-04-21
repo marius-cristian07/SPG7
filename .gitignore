@@ -48,6 +48,24 @@ Generated\ Files/
 # NUnit
 *.VisualState.xml
 TestResult.xml
+
+# LaTeX build files
+*.aux
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.pdf
+*.synctex.gz
+*.toc
+*.synctex(busy)
+*.bbl
+*.blg
+*.log
+*.nav
+*.snm
+*.vrb
 nunit-*.xml
 
 # Build Results of an ATL Project
