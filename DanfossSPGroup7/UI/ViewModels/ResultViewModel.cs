@@ -6,7 +6,6 @@ using DanfossSPGroup7.Domain;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using System.Text;
-
 namespace DanfossSPGroup7.UI.ViewModels;
 
 public partial class ResultViewModel : ObservableObject
@@ -15,9 +14,15 @@ public partial class ResultViewModel : ObservableObject
 
     [ObservableProperty] private ISeries[] series = Array.Empty<ISeries>();
 
+    [ObservableProperty] private ISeries[] heatDemandSeries = Array.Empty<ISeries>();
+
     public Axis[] XAxes { get; set; } = Array.Empty<Axis>();
 
     public Axis[] YAxes { get; set; } = Array.Empty<Axis>();
+
+    public Axis[] HeatDemandXAxes { get; set; } = Array.Empty<Axis>();
+
+    public Axis[] HeatDemandYAxes { get; set; } = Array.Empty<Axis>();
 
     private readonly List<string> _allowedUnitNames = new();
 
@@ -27,6 +32,7 @@ public partial class ResultViewModel : ObservableObject
         try
         {
             SetupAxes();
+            SetupHeatDemandAxes();
             LoadReport(1, false, new List<string> { "GB1", "GB2", "GB3", "OB1" });
         }
         catch (Exception ex)
@@ -41,6 +47,7 @@ public partial class ResultViewModel : ObservableObject
         try
         {
             SetupAxes();
+            SetupHeatDemandAxes();
             _allowedUnitNames = allowedUnitNames ?? new List<string>();
             LoadReport(scenarioNumber, isSummer, _allowedUnitNames);
         }
@@ -72,6 +79,56 @@ public partial class ResultViewModel : ObservableObject
                 Name = "Cost",
                 Labeler = value => $"{value:N0} DKK"
             }
+        };
+    }
+
+
+    private void LoadHeatDemandGraph(bool isSummer, int scenarioNumber)
+    {
+        if (Optimizer.Instance == null)
+        {
+            HeatDemandSeries = Array.Empty<ISeries>();
+            return;
+        }
+
+        var sourceData = isSummer ? Optimizer.Instance.Summer : Optimizer.Instance.Winter;
+
+        var orderedPoints = sourceData.OrderBy(kvp => kvp.Key).Take(336).ToList();
+
+        var demandValues = orderedPoints.Select(kvp => kvp.Value.HeatDemand).ToArray();
+
+        HeatDemandSeries = new ISeries[]
+        {
+        new LineSeries<double>
+        {
+            Values = demandValues,
+            Name = isSummer? $"Scenario {scenarioNumber} Summer Heat Demand": $"Scenario {scenarioNumber} Winter Heat Demand",
+            GeometrySize = 0
+        }
+        };
+    }
+
+    private void SetupHeatDemandAxes()
+    {
+        HeatDemandXAxes = new Axis[]
+        {
+        new Axis
+        {
+            Name = "Time",
+            UnitWidth = 24,
+            MinStep = 24,
+            ForceStepToMin = true,
+            Labeler = value => $"Day {(int)value / 24 + 1}"
+        }
+        };
+
+        HeatDemandYAxes = new Axis[]
+        {
+        new Axis
+        {
+            Name = "Heat Demand (MW)",
+            Labeler = value => $"{value:F1}"
+        }
         };
     }
 
@@ -118,6 +175,7 @@ public partial class ResultViewModel : ObservableObject
         ResultsText = sb.ToString();
 
         double[] hourlyCosts = new double[results.Count];
+        double[] hourlyHeatDemand = new double[results.Count];
 
         for (int i = 0; i < results.Count; i++)
         {
@@ -140,5 +198,6 @@ public partial class ResultViewModel : ObservableObject
                 GeometrySize = 0
             }
         };
+        LoadHeatDemandGraph(isSummer, scenarioNumber);
     }
 }

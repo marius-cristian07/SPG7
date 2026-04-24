@@ -25,5 +25,13 @@
                  IsReadOnly="True"
                  AcceptsReturn="True"
                  TextWrapping="Wrap" />
+        <TextBlock Text="Heat Demand"
+           FontSize="24"
+           Margin="0,20,0,10" />
+
+        <lvc:CartesianChart Series="{Binding HeatDemandSeries}"
+                    XAxes="{Binding HeatDemandXAxes}"
+                    YAxes="{Binding HeatDemandYAxes}"
+                    Height="300" />
     </Grid>
 </UserControl>
