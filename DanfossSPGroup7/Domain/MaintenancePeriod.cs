@@ -18,10 +18,6 @@ namespace DanfossSPGroup7.Domain
             return time >= Start && time < End;
         }
 
-        public bool Overlaps(MaintenancePeriod other)
-        {
-            return Start < other.End && End > other.Start;
-        }
 
     }
 }

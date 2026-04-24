@@ -5,6 +5,7 @@ namespace DanfossSPGroup7.Domain
 {
     public class MaintenanceCalculation
     {
+        // Setting Maintenance Period for a Boiler. 
         public void CreateMaintenanceForBoiler(string boilerName, int duration, List<ProductionUnit> units)
         {
             DateTime fixedMaintenanceStart = new DateTime(2026, 1, 8, 0, 0, 0);
