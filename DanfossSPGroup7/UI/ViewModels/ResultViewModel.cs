@@ -16,6 +16,8 @@ public partial class ResultViewModel : ObservableObject
 
     [ObservableProperty] private ISeries[] heatDemandSeries = Array.Empty<ISeries>();
 
+    [ObservableProperty] private ISeries[] co2Series = Array.Empty<ISeries>();
+
     public Axis[] XAxes { get; set; } = Array.Empty<Axis>();
 
     public Axis[] YAxes { get; set; } = Array.Empty<Axis>();
@@ -23,6 +25,10 @@ public partial class ResultViewModel : ObservableObject
     public Axis[] HeatDemandXAxes { get; set; } = Array.Empty<Axis>();
 
     public Axis[] HeatDemandYAxes { get; set; } = Array.Empty<Axis>();
+
+    public Axis[] Co2XAxes { get; set; } = Array.Empty<Axis>();
+
+    public Axis[] Co2YAxes { get; set; } = Array.Empty<Axis>();
 
     private readonly List<string> _allowedUnitNames = new();
 
@@ -33,6 +39,7 @@ public partial class ResultViewModel : ObservableObject
         {
             SetupAxes();
             SetupHeatDemandAxes();
+            SetupCo2Axes();
             LoadReport(1, false, new List<string> { "GB1", "GB2", "GB3", "OB1" });
         }
         catch (Exception ex)
@@ -48,6 +55,7 @@ public partial class ResultViewModel : ObservableObject
         {
             SetupAxes();
             SetupHeatDemandAxes();
+            SetupCo2Axes();
             _allowedUnitNames = allowedUnitNames ?? new List<string>();
             LoadReport(scenarioNumber, isSummer, _allowedUnitNames);
         }
@@ -132,6 +140,57 @@ public partial class ResultViewModel : ObservableObject
         };
     }
 
+    private void SetupCo2Axes()
+    {
+        Co2XAxes = new Axis[]
+        {
+            new Axis
+            {
+                Name = "Time",
+                UnitWidth = 24,
+                MinStep = 24,
+                ForceStepToMin = true,
+                Labeler = value => $"Day {(int)value / 24 + 1}"
+            }
+        };
+
+        Co2YAxes = new Axis[]
+        {
+            new Axis
+            {
+                Name = "CO2 Emissions (kg/h)",
+                Labeler = value => $"{value:N0}"
+            }
+        };
+    }
+
+    private void LoadCo2Graph(bool isSummer, int scenarioNumber, List<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)> results)
+    {
+        double[] hourlyCo2 = new double[results.Count];
+
+        for (int i = 0; i < results.Count; i++)
+        {
+            double totalCo2ForThisHour = 0;
+
+            foreach (var item in results[i].Schedule)
+            {
+                totalCo2ForThisHour += item.HeatMW * item.Co2;
+            }
+
+            hourlyCo2[i] = totalCo2ForThisHour;
+        }
+
+        Co2Series = new ISeries[]
+        {
+            new LineSeries<double>
+            {
+                Values = hourlyCo2,
+                Name = isSummer ? $"Scenario {scenarioNumber} Summer CO2" : $"Scenario {scenarioNumber} Winter CO2",
+                GeometrySize = 0
+            }
+        };
+    }
+
     public void LoadReport(int scenarioNumber, bool isSummer, List<string> allowedUnitNames)
     {
         if (Optimizer.Instance == null)
@@ -175,7 +234,6 @@ public partial class ResultViewModel : ObservableObject
         ResultsText = sb.ToString();
 
         double[] hourlyCosts = new double[results.Count];
-        double[] hourlyHeatDemand = new double[results.Count];
 
         for (int i = 0; i < results.Count; i++)
         {
@@ -199,5 +257,6 @@ public partial class ResultViewModel : ObservableObject
             }
         };
         LoadHeatDemandGraph(isSummer, scenarioNumber);
+        LoadCo2Graph(isSummer, scenarioNumber, results);
     }
 }

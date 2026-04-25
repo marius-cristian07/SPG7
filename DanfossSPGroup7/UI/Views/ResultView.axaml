@@ -5,33 +5,54 @@
              x:Class="DanfossSPGroup7.UI.Views.ResultView"
              x:DataType="vm:ResultViewModel"
              Background="White">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" Margin="20">
+            <TextBlock Grid.Row="0"
+                       Text="Optimization Results"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Margin="0,0,0,12"/>
 
-  
+            <TextBlock Grid.Row="1"
+                       Text="Cost"
+                       FontSize="24"
+                       Margin="0,8,0,10" />
 
-    <Grid RowDefinitions="Auto,300,*" Margin="20">
-        <TextBlock Text="Optimization Results"
-                   FontSize="24"
-                   FontWeight="Bold"
-                   Margin="0,0,0,12"/>
-        
-        <lvc:CartesianChart Grid.Row="1"
-                            Series="{Binding Series}"
-                            XAxes="{Binding XAxes}"
-                            YAxes="{Binding YAxes}" />
-        
-        <TextBox Grid.Row="2"
-                 Margin="0,12,0,0"
-                 Text="{Binding ResultsText}"
-                 IsReadOnly="True"
-                 AcceptsReturn="True"
-                 TextWrapping="Wrap" />
-        <TextBlock Text="Heat Demand"
-           FontSize="24"
-           Margin="0,20,0,10" />
+            <lvc:CartesianChart Grid.Row="2"
+                                Series="{Binding Series}"
+                                XAxes="{Binding XAxes}"
+                                YAxes="{Binding YAxes}"
+                                Height="300" />
 
-        <lvc:CartesianChart Series="{Binding HeatDemandSeries}"
-                    XAxes="{Binding HeatDemandXAxes}"
-                    YAxes="{Binding HeatDemandYAxes}"
-                    Height="300" />
-    </Grid>
+            <TextBlock Grid.Row="3"
+                       Text="Heat Demand"
+                       FontSize="24"
+                       Margin="0,20,0,10" />
+
+            <lvc:CartesianChart Grid.Row="4"
+                                Series="{Binding HeatDemandSeries}"
+                                XAxes="{Binding HeatDemandXAxes}"
+                                YAxes="{Binding HeatDemandYAxes}"
+                                Height="300" />
+
+            <TextBlock Grid.Row="5"
+                       Text="CO2 Emissions"
+                       FontSize="24"
+                       Margin="0,20,0,10" />
+
+            <lvc:CartesianChart Grid.Row="6"
+                                Series="{Binding Co2Series}"
+                                XAxes="{Binding Co2XAxes}"
+                                YAxes="{Binding Co2YAxes}"
+                                Height="300" />
+
+            <TextBox Grid.Row="7"
+                     Margin="0,12,0,0"
+                     Text="{Binding ResultsText}"
+                     IsReadOnly="True"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap"
+                     MinHeight="200" />
+        </Grid>
+    </ScrollViewer>
 </UserControl>
