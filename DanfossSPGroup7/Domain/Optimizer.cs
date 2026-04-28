@@ -86,10 +86,12 @@ namespace DanfossSPGroup7.Domain
         }
 
         // Scenario 2
-        public List<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)> RunScenario2(bool isSummer)
+        public List<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)> RunScenario2(bool isSummer, IEnumerable<string>? allowedUnitNames = null)
         {
             var dict = isSummer ? Summer : Winter;
             var results = new List<(DateTime, List<(ProductionUnit, double, double)>)>();
+
+            var allowedSet = allowedUnitNames != null ? new HashSet<string>(allowedUnitNames): null;
 
             foreach (var kvp in dict)
             {
@@ -98,6 +100,7 @@ namespace DanfossSPGroup7.Domain
 
                 var orderedUnits = _productionUnits
                     .Where(u => u.IsAvailable(kvp.Key))
+                    .Where(u => allowedSet == null || allowedSet.Contains(u.Name))
                     .Select(u => new { Unit = u, Cost = CalculateNetProductionCost(u, price) })
                     .OrderBy(x => x.Cost)
                     .ToList();
