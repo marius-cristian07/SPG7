@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using DanfossSPGroup7.Domain;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
+using CommunityToolkit.Mvvm.Input;
 using System.Text;
 
 namespace DanfossSPGroup7.UI.ViewModels;
@@ -65,15 +66,45 @@ public partial class ResultViewModel : ObservableObject
             SetupCo2Axes();
             SetupNetCostAxes();
 
-            _allowedUnitNames = allowedUnitNames ?? new List<string>();
 
-            LoadReport(scenarioNumber, isSummer, _allowedUnitNames);
+            _currentScenario = scenarioNumber;
+            _currentIsSummer = isSummer;
+            _currentUnitNames = allowedUnitNames ?? new List<string>();
+
+            LoadReport(_currentScenario, _currentIsSummer, _currentUnitNames);
         }
         catch (Exception ex)
         {
             ResultsText = "RESULTS ERROR:\n" + ex;
             Series = Array.Empty<ISeries>();
         }
+    }
+
+
+    private int _currentScenario = 1;
+    private bool _currentIsSummer = false;
+    private List<string> _currentUnitNames = new();
+
+    [RelayCommand]
+    public void ChangeScenario(string scenarioNum)
+    {
+        _currentScenario = int.Parse(scenarioNum);
+        // when switching scenario, refresh the allowed units
+        if (_currentScenario == 1)
+            _currentUnitNames = new List<string> { "GB1", "GB2", "GB3", "OB1" };
+        else
+            _currentUnitNames = new List<string> { "GM1", "EB1", "GB1", "GB3" };
+
+        LoadReport(_currentScenario, _currentIsSummer, _currentUnitNames);
+    }
+
+    [RelayCommand]
+    public void ChangeSeason(string isSummerStr)
+    {
+        _currentIsSummer = bool.Parse(isSummerStr);
+        
+        // Use the same unit list but change the season
+        LoadReport(_currentScenario, _currentIsSummer, _currentUnitNames);
     }
 
     private void SetupAxes()

@@ -6,6 +6,8 @@ using CommunityToolkit.Mvvm.Input;
 using DanfossSPGroup7.Data;
 using DanfossSPGroup7.Domain;
 using System;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 
 namespace DanfossSPGroup7.UI.ViewModels;
 
@@ -14,18 +16,35 @@ public partial class AssetViewModel : ObservableObject
 
     private readonly MaintenanceCalculation _calculator = new MaintenanceCalculation();
     private readonly AssetManager _dataService = new AssetManager();
+    private readonly ObservableCollection<UnitConfigViewModel> _scenario1Configs = new();
+    private readonly ObservableCollection<UnitConfigViewModel> _scenario2Configs = new();
     [ObservableProperty] private int _selectedScenario = 1; // make the default scenario 1
     [ObservableProperty] private ObservableCollection<UnitConfigViewModel> _displayUnits = new();
-    [ObservableProperty] private bool _isSummer = false;
 
     public AssetViewModel()
     {
+        var allUnits = _dataService.GetProductionUnits();
+        // load all units so the checkboxes/maintenance slider dont reset
+        // scenario 1 config (GB1, GB2, GB3, OB1)
+        var s1Names = new[] { "GB1", "GB2", "GB3", "OB1" };
+        foreach (var unit in allUnits.Where(u => s1Names.Contains(u.Name)))
+        {
+            _scenario1Configs.Add(new UnitConfigViewModel(unit, this) { IsScenario2 = false });
+        }
+
+        // scenario 2 config (GM1, EB1, GB1, GB3)
+        var s2Names = new[] { "GM1", "EB1", "GB1", "GB3" };
+        foreach (var unit in allUnits.Where(u => s2Names.Contains(u.Name)))
+        {
+            // We create NEW instances here so they are independent of Scenario 1
+            _scenario2Configs.Add(new UnitConfigViewModel(unit, this) { IsScenario2 = true });
+        }
         LoadScenario(1);
     }
 
     [RelayCommand]
     public void SwitchScenario(string scenarioNumber)
-    {
+    {    
         SelectedScenario = int.Parse(scenarioNumber);
         LoadScenario(SelectedScenario);
     }
@@ -48,32 +67,12 @@ public partial class AssetViewModel : ObservableObject
 
     public void LoadScenario(int scenario)
     {
-        DisplayUnits.Clear();
+        SelectedScenario = scenario;
+        
+        // preserve checkboxes/sliders in the list that is hidden
+        DisplayUnits = (scenario == 1) ? _scenario1Configs : _scenario2Configs;
 
-        var allUnits = _dataService.GetProductionUnits();
-        IEnumerable<ProductionUnit> selectedUnits;
-
-        if (scenario == 1)
-        {
-            //Scenario 1 - (GB1, GB2, GB3, OB1)
-            selectedUnits= allUnits.Where(unit => new[] { "GB1", "GB2", "GB3", "OB1" }.Contains(unit.Name));
-        }
-        else
-        {
-            //Scenario 2 - (GM1, EB1, GB1, GB3)
-            selectedUnits = allUnits.Where(unit => new[] { "GM1", "EB1", "GB1", "GB3" }.Contains(unit.Name));
-        }
-
-        foreach (var unit in selectedUnits)
-        {
-            DisplayUnits.Add(new UnitConfigViewModel(unit, this)
-            {
-                //Scenario 1 - all units are activated and cannot be deactivated unless for maintenance
-                //Scenario 2 - by defaul the units are activated but can be toggled to see different combinations
-                IsActive = true,
-                IsScenario2 = (scenario == 2)
-            });
-        }
+        HandleMaintenanceChange();
     }
 
     // bonus requirement logic for results tab to check if scenario2 is modified from default state
@@ -98,6 +97,7 @@ public partial class AssetViewModel : ObservableObject
         private AssetViewModel? _parent;
 
         public ProductionUnit Unit {get; set;}
+        public Bitmap UnitImage { get; }
         [ObservableProperty] private bool _isActive;
         [ObservableProperty] private bool _isScenario2;
         [ObservableProperty] private bool _isSelectedForMaintenance;
@@ -107,6 +107,7 @@ public partial class AssetViewModel : ObservableObject
         public UnitConfigViewModel(ProductionUnit unit, AssetViewModel? parent = null) 
         { 
             Unit = unit;
+            UnitImage = new Bitmap(AssetLoader.Open(new Uri(unit.ImagePath)));
             _parent = parent;
         }
 

@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace DanfossSPGroup7.UI.ViewModels;
 
@@ -22,13 +22,13 @@ public partial class MainViewModel : ObservableObject
         {
             AssetPage.PrepareOptimization(); // saves maintenance to units
 
-            CurrentViewModel = new ResultViewModel(
-                AssetPage.SelectedScenario,
-                AssetPage.IsSummer,
-                AssetPage.GetSelectedUnitNames()
-            );
+            // make scenario1 show first
+            var scenario1Units = new List<string> { "GB1", "GB2", "GB3", "OB1" };
+
+            // force scenario 1 (winter) as the first view
+            CurrentViewModel = new ResultViewModel(1, false, scenario1Units);
             return;
-            }
+        }
             
 
         CurrentViewModel = viewName switch
