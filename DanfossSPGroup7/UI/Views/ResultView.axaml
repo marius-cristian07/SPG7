@@ -39,7 +39,7 @@
 
             
             <TextBlock Grid.Row="2"
-                       Text="Cost"
+                       Text="Heat Production"
                        FontSize="24"
                        Margin="0,8,0,10"/>
 
@@ -47,6 +47,7 @@
                                 Series="{Binding Series}"
                                 XAxes="{Binding XAxes}"
                                 YAxes="{Binding YAxes}"
+                                LegendPosition="Top"
                                 Height="300"/>
 
             
@@ -59,6 +60,7 @@
                                 Series="{Binding HeatDemandSeries}"
                                 XAxes="{Binding HeatDemandXAxes}"
                                 YAxes="{Binding HeatDemandYAxes}"
+                                LegendPosition="Top"
                                 Height="300"/>
 
             
@@ -71,21 +73,21 @@
                                 Series="{Binding Co2Series}"
                                 XAxes="{Binding Co2XAxes}"
                                 YAxes="{Binding Co2YAxes}"
+                                LegendPosition="Top"
                                 Height="300"/>
 
             
            <TextBlock Grid.Row="8"
                       Text="Net Production Cost"
                       FontSize="24"
-                      Margin="0,20,0,10"
-                      IsVisible="{Binding IsScenario2}"/>
+                      Margin="0,20,0,10"/>
 
           <lvc:CartesianChart Grid.Row="9"
                                Series="{Binding NetProductionCostSeries}"
                                XAxes="{Binding NetCostXAxes}"
                                YAxes="{Binding NetCostYAxes}"
-                               Height="300"
-                               IsVisible="{Binding IsScenario2}"/>
+                               LegendPosition="Top"
+                               Height="300"/>
 
             
             <TextBox Grid.Row="10"
