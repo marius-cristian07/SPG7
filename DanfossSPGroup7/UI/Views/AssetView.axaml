@@ -67,6 +67,13 @@
                             IsChecked="{Binding IsSelectedForMaintenance}"
                             IsEnabled="{Binding CanToggleMaintenance}" />
                   <StackPanel IsVisible="{Binding IsSelectedForMaintenance}">
+                    <TextBlock Text="Start Day" FontSize="10" Foreground="Gray"/>
+                    <ComboBox ItemsSource="{Binding #Root.DataContext.MaintenanceStartDayOptions}"
+                              SelectedItem="{Binding MaintenanceStartDay}"
+                              HorizontalAlignment="Stretch"
+                              Margin="0,5,0,10"/>
+                    
+                    <TextBlock Text="Maintenance Duration" FontSize="11" Foreground="Gray"/>
                     <Slider Minimum="30" Maximum="60" Value="{Binding MaintenanceDuration}" />
                     <TextBlock Text="{Binding MaintenanceDuration, StringFormat='{}{0} Hours'}" FontSize="10" HorizontalAlignment="Right"/>
                   </StackPanel>

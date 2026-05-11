@@ -20,13 +20,13 @@ public partial class MainViewModel : ObservableObject
     {   
         if (viewName == "Result")
         {
-            AssetPage.PrepareOptimization(); // saves maintenance to units
+            AssetPage.PrepareOptimization(1, false); // saves maintenance to units
 
             // make scenario1 show first
-            var scenario1Units = new List<string> { "GB1", "GB2", "GB3", "OB1" };
+            var scenario1Units = AssetPage.GetSelectedUnitNames(1);
 
             // force scenario 1 (winter) as the first view
-            CurrentViewModel = new ResultViewModel(1, false, scenario1Units);
+            CurrentViewModel = new ResultViewModel(AssetPage, 1, false, scenario1Units);
             return;
         }
             

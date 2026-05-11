@@ -23,6 +23,7 @@ public partial class ResultViewModel : ObservableObject
     [ObservableProperty] private ISeries[] netProductionCostSeries = Array.Empty<ISeries>();
 
     [ObservableProperty] private bool isScenario2;
+    private readonly AssetViewModel _assetPage;
     
 
     public Axis[] XAxes { get; set; } = Array.Empty<Axis>();
@@ -57,7 +58,7 @@ public partial class ResultViewModel : ObservableObject
         }
     }
 
-    public ResultViewModel(int scenarioNumber, bool isSummer, List<string> allowedUnitNames)
+    public ResultViewModel(AssetViewModel assetPage, int scenarioNumber, bool isSummer, List<string> allowedUnitNames)
     {
         try
         {
@@ -66,11 +67,12 @@ public partial class ResultViewModel : ObservableObject
             SetupCo2Axes();
             SetupNetCostAxes();
 
-
+            _assetPage = assetPage;
             _currentScenario = scenarioNumber;
             _currentIsSummer = isSummer;
             _currentUnitNames = allowedUnitNames ?? new List<string>();
 
+            _assetPage.PrepareOptimization(_currentScenario, _currentIsSummer);
             LoadReport(_currentScenario, _currentIsSummer, _currentUnitNames);
         }
         catch (Exception ex)
@@ -89,11 +91,11 @@ public partial class ResultViewModel : ObservableObject
     public void ChangeScenario(string scenarioNum)
     {
         _currentScenario = int.Parse(scenarioNum);
-        // when switching scenario, refresh the allowed units
-        if (_currentScenario == 1)
-            _currentUnitNames = new List<string> { "GB1", "GB2", "GB3", "OB1" };
-        else
-            _currentUnitNames = new List<string> { "GM1", "EB1", "GB1", "GB3" };
+
+        // re-apply the maintenance specifically for the NEW scenario
+        _assetPage.PrepareOptimization(_currentScenario, _currentIsSummer);
+        // when switching scenario, refresh the allowed units from the asset page
+        _currentUnitNames = _assetPage.GetSelectedUnitNames(_currentScenario);
 
         LoadReport(_currentScenario, _currentIsSummer, _currentUnitNames);
     }
@@ -102,6 +104,7 @@ public partial class ResultViewModel : ObservableObject
     public void ChangeSeason(string isSummerStr)
     {
         _currentIsSummer = bool.Parse(isSummerStr);
+        _assetPage.PrepareOptimization(_currentScenario, _currentIsSummer);
         
         // Use the same unit list but change the season
         LoadReport(_currentScenario, _currentIsSummer, _currentUnitNames);

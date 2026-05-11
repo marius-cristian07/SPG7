@@ -20,6 +20,8 @@ public partial class AssetViewModel : ObservableObject
     private readonly ObservableCollection<UnitConfigViewModel> _scenario2Configs = new();
     [ObservableProperty] private int _selectedScenario = 1; // make the default scenario 1
     [ObservableProperty] private ObservableCollection<UnitConfigViewModel> _displayUnits = new();
+    public IReadOnlyList<string> MaintenanceStartDayOptions { get; } =
+        new[] { "1st day", "2nd day", "3rd day", "4th day" };
 
     public AssetViewModel()
     {
@@ -29,7 +31,7 @@ public partial class AssetViewModel : ObservableObject
         var s1Names = new[] { "GB1", "GB2", "GB3", "OB1" };
         foreach (var unit in allUnits.Where(u => s1Names.Contains(u.Name)))
         {
-            _scenario1Configs.Add(new UnitConfigViewModel(unit, this) { IsScenario2 = false });
+            _scenario1Configs.Add(new UnitConfigViewModel(unit, this) { IsActive = true, IsScenario2 = false });
         }
 
         // scenario 2 config (GM1, EB1, GB1, GB3)
@@ -37,7 +39,7 @@ public partial class AssetViewModel : ObservableObject
         foreach (var unit in allUnits.Where(u => s2Names.Contains(u.Name)))
         {
             // We create NEW instances here so they are independent of Scenario 1
-            _scenario2Configs.Add(new UnitConfigViewModel(unit, this) { IsScenario2 = true });
+            _scenario2Configs.Add(new UnitConfigViewModel(unit, this) { IsActive = true, IsScenario2 = true });
         }
         LoadScenario(1);
     }
@@ -85,10 +87,26 @@ public partial class AssetViewModel : ObservableObject
 
     public List<string> GetSelectedUnitNames()
     {
-        return DisplayUnits
+        return GetSelectedUnitNames(SelectedScenario);
+    }
+
+    public List<string> GetSelectedUnitNames(int scenario)
+    {
+        var configs = scenario == 1 ? _scenario1Configs : _scenario2Configs;
+
+        return configs
             .Where(unit => unit.IsActive)
             .Select(unit => unit.Unit.Name)
             .ToList();
+    }
+
+    private static DateTime GetSourceStartDate(bool isSummer)
+    {
+        if (Optimizer.Instance == null)
+            return new DateTime(2026, 1, 5);
+
+        var sourceData = isSummer ? Optimizer.Instance.Summer : Optimizer.Instance.Winter;
+        return sourceData.Keys.Min().Date;
     }
 
 
@@ -103,6 +121,7 @@ public partial class AssetViewModel : ObservableObject
         [ObservableProperty] private bool _isSelectedForMaintenance;
         [ObservableProperty] private bool _canToggleMaintenance = true; // default for every unit
         [ObservableProperty] private int _maintenanceDuration = 30; // by default we select the minimum
+        [ObservableProperty] private string _maintenanceStartDay = "1st day";
 
         public UnitConfigViewModel(ProductionUnit unit, AssetViewModel? parent = null) 
         { 
@@ -119,8 +138,7 @@ public partial class AssetViewModel : ObservableObject
     }
 
 
-    [RelayCommand]
-    public void PrepareOptimization()
+    public void PrepareOptimization(int scenario, bool isSummer)
     {   
         if (Optimizer.Instance == null)
             return;
@@ -131,25 +149,28 @@ public partial class AssetViewModel : ObservableObject
             unit.ClearMaintenance();
         }
 
-        // finds the unit where the user checked the maintenance box
-        var selectedUnit = DisplayUnits.FirstOrDefault(unit => unit.IsSelectedForMaintenance);
+        // see which units are active based on the scenario
+        var activeConfigs = (scenario == 1) ? _scenario1Configs : _scenario2Configs;
 
-        if(selectedUnit == null)
-            return;
-        if(Optimizer.Instance == null)
-            return;
-        try
+        // finds the unit where the user checked the maintenance box and apply its specific date and duration
+        var selectedUnit = activeConfigs.FirstOrDefault(unit => unit.IsSelectedForMaintenance);
+
+        if (selectedUnit != null)
         {
+            int selectedDayOffset = MaintenanceStartDayOptions
+                .ToList()
+                .IndexOf(selectedUnit.MaintenanceStartDay);
+
+            selectedDayOffset = Math.Clamp(selectedDayOffset, 0, 3);
+
+            DateTime startDate = GetSourceStartDate(isSummer).AddDays(selectedDayOffset);
 
             _calculator.CreateMaintenanceForBoiler(
                 selectedUnit.Unit.Name,
                 selectedUnit.MaintenanceDuration,
-                Optimizer.Instance.ProductionUnits
+                Optimizer.Instance.ProductionUnits,
+                startDate
             );
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"ERROR: {ex.Message}");
         }
     }
 }

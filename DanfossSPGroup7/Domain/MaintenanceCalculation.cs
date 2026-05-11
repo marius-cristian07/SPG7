@@ -1,31 +1,25 @@
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
 namespace DanfossSPGroup7.Domain
 {
     public class MaintenanceCalculation
     {
         // Setting Maintenance Period for a Boiler. 
-        public void CreateMaintenanceForBoiler(string boilerName, int duration, List<ProductionUnit> units)
-        {
-            DateTime fixedMaintenanceStart = new DateTime(2026, 1, 8, 0, 0, 0);
-            ProductionUnit chosenUnit = null;
-
-            foreach (var unit in units)
-            {
-                if (unit.Name == boilerName)
-                {
-                    chosenUnit = unit;
-                    break;
-                }
-            }
+        public void CreateMaintenanceForBoiler(string unitName, int duration, List<ProductionUnit> allUnits, DateTime startDate)
+        {   
+            // Use the parameters passed into the method
+            ProductionUnit? chosenUnit = allUnits.FirstOrDefault(u => u.Name == unitName);
 
             if (chosenUnit == null)
-                throw new ArgumentException($"Boiler '{boilerName}' is not found");
+                throw new ArgumentException($"Boiler '{unitName}' is not found");
 
+            // Use the dynamic startDate from the UI
             var maintenance = new MaintenancePeriod(
-                fixedMaintenanceStart, fixedMaintenanceStart.AddHours(duration)
+                startDate, 
+                startDate.AddHours(duration)
             );
+        
             chosenUnit.ScheduleMaintenance(maintenance);
 
         }
