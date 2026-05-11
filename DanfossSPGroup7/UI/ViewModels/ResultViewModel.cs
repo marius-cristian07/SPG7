@@ -25,7 +25,7 @@ public partial class ResultViewModel : ObservableObject
     [ObservableProperty] private ISeries[] netProductionCostSeries = Array.Empty<ISeries>();
 
     [ObservableProperty] private bool isScenario2;
-    private readonly AssetViewModel _assetPage;
+    private readonly AssetViewModel? _assetPage;
     
 
     public Axis[] XAxes { get; set; } = Array.Empty<Axis>();
@@ -88,7 +88,6 @@ public partial class ResultViewModel : ObservableObject
             _currentIsSummer = isSummer;
             _currentUnitNames = allowedUnitNames ?? new List<string>();
 
-            _assetPage.PrepareOptimization(_currentScenario, _currentIsSummer);
             LoadReport(_currentScenario, _currentIsSummer, _currentUnitNames);
         }
         catch (Exception ex)
@@ -108,10 +107,17 @@ public partial class ResultViewModel : ObservableObject
     {
         _currentScenario = int.Parse(scenarioNum);
 
-        // re-apply the maintenance specifically for the NEW scenario
-        _assetPage.PrepareOptimization(_currentScenario, _currentIsSummer);
         // when switching scenario, refresh the allowed units from the asset page
-        _currentUnitNames = _assetPage.GetSelectedUnitNames(_currentScenario);
+        if (_assetPage != null)
+        {
+            _currentUnitNames = _assetPage.GetSelectedUnitNames(_currentScenario);
+        }
+        else
+        {
+            _currentUnitNames = _currentScenario == 1
+                ? new List<string> { "GB1", "GB2", "GB3", "OB1" }
+                : new List<string> { "GM1", "EB1", "GB1", "GB3" };
+        }
 
         LoadReport(_currentScenario, _currentIsSummer, _currentUnitNames);
     }
@@ -120,7 +126,6 @@ public partial class ResultViewModel : ObservableObject
     public void ChangeSeason(string isSummerStr)
     {
         _currentIsSummer = bool.Parse(isSummerStr);
-        _assetPage.PrepareOptimization(_currentScenario, _currentIsSummer);
         
         // Use the same unit list but change the season
         LoadReport(_currentScenario, _currentIsSummer, _currentUnitNames);
@@ -405,6 +410,13 @@ public partial class ResultViewModel : ObservableObject
             return;
         }
 
+        if (_assetPage != null)
+        {
+            _assetPage.PrepareOptimization(scenarioNumber, isSummer);
+            allowedUnitNames = _assetPage.GetSelectedUnitNames(scenarioNumber);
+            _currentUnitNames = allowedUnitNames;
+        }
+
         List<(DateTime Hour,
         List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)> results;
 
@@ -431,6 +443,7 @@ public partial class ResultViewModel : ObservableObject
         var sb = new StringBuilder();
 
         sb.AppendLine($"Scenario {scenarioNumber} - {(isSummer ? "Summer" : "Winter")}");
+        AppendMaintenanceSummary(sb);
         sb.AppendLine();
 
         foreach (var hour in results.Take(96))
@@ -453,5 +466,24 @@ public partial class ResultViewModel : ObservableObject
         LoadCo2Graph(isSummer, scenarioNumber, results);
 
         LoadNetProductionCostGraph(isSummer, results);
+    }
+
+    private static void AppendMaintenanceSummary(StringBuilder sb)
+    {
+        if (Optimizer.Instance == null)
+            return;
+
+        var maintenanceUnit = Optimizer.Instance.ProductionUnits
+            .FirstOrDefault(unit => unit.MaintenancePeriods.Any());
+
+        if (maintenanceUnit == null)
+        {
+            sb.AppendLine("Maintenance: none");
+            return;
+        }
+
+        var maintenance = maintenanceUnit.MaintenancePeriods.First();
+        sb.AppendLine(
+            $"Maintenance: {maintenanceUnit.Name} from {maintenance.Start:yyyy-MM-dd HH:mm} to {maintenance.End:yyyy-MM-dd HH:mm}");
     }
 }

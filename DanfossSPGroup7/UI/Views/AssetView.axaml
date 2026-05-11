@@ -69,7 +69,7 @@
                   <StackPanel IsVisible="{Binding IsSelectedForMaintenance}">
                     <TextBlock Text="Start Day" FontSize="10" Foreground="Gray"/>
                     <ComboBox ItemsSource="{Binding #Root.DataContext.MaintenanceStartDayOptions}"
-                              SelectedItem="{Binding MaintenanceStartDay}"
+                              SelectedIndex="{Binding MaintenanceStartDayIndex, Mode=TwoWay}"
                               HorizontalAlignment="Stretch"
                               Margin="0,5,0,10"/>
                     

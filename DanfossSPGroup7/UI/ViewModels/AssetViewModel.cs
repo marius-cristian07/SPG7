@@ -55,7 +55,7 @@ public partial class AssetViewModel : ObservableObject
     // disable other maintenance options when one is selected already
     public void HandleMaintenanceChange()
     {
-        // check if any unit is already selected for maintenance
+        // check if any unit is already selected for maintenance in the visible scenario
         var selectedUnit = DisplayUnits.FirstOrDefault(unit => unit.IsSelectedForMaintenance);
         
         foreach (var unit in DisplayUnits)
@@ -92,12 +92,17 @@ public partial class AssetViewModel : ObservableObject
 
     public List<string> GetSelectedUnitNames(int scenario)
     {
-        var configs = scenario == 1 ? _scenario1Configs : _scenario2Configs;
+        var configs = GetScenarioConfigs(scenario);
 
         return configs
             .Where(unit => unit.IsActive)
             .Select(unit => unit.Unit.Name)
             .ToList();
+    }
+
+    private ObservableCollection<UnitConfigViewModel> GetScenarioConfigs(int scenario)
+    {
+        return scenario == 1 ? _scenario1Configs : _scenario2Configs;
     }
 
     private static DateTime GetSourceStartDate(bool isSummer)
@@ -121,7 +126,7 @@ public partial class AssetViewModel : ObservableObject
         [ObservableProperty] private bool _isSelectedForMaintenance;
         [ObservableProperty] private bool _canToggleMaintenance = true; // default for every unit
         [ObservableProperty] private int _maintenanceDuration = 30; // by default we select the minimum
-        [ObservableProperty] private string _maintenanceStartDay = "1st day";
+        [ObservableProperty] private int _maintenanceStartDayIndex;
 
         public UnitConfigViewModel(ProductionUnit unit, AssetViewModel? parent = null) 
         { 
@@ -150,18 +155,14 @@ public partial class AssetViewModel : ObservableObject
         }
 
         // see which units are active based on the scenario
-        var activeConfigs = (scenario == 1) ? _scenario1Configs : _scenario2Configs;
+        var activeConfigs = GetScenarioConfigs(scenario);
 
         // finds the unit where the user checked the maintenance box and apply its specific date and duration
         var selectedUnit = activeConfigs.FirstOrDefault(unit => unit.IsSelectedForMaintenance);
 
         if (selectedUnit != null)
         {
-            int selectedDayOffset = MaintenanceStartDayOptions
-                .ToList()
-                .IndexOf(selectedUnit.MaintenanceStartDay);
-
-            selectedDayOffset = Math.Clamp(selectedDayOffset, 0, 3);
+            int selectedDayOffset = Math.Clamp(selectedUnit.MaintenanceStartDayIndex, 0, 3);
 
             DateTime startDate = GetSourceStartDate(isSummer).AddDays(selectedDayOffset);
 
