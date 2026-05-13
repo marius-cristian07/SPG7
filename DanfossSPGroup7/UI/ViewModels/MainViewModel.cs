@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace DanfossSPGroup7.UI.ViewModels;
 
@@ -20,15 +20,14 @@ public partial class MainViewModel : ObservableObject
     {   
         if (viewName == "Result")
         {
-            AssetPage.PrepareOptimization(); // saves maintenance to units
+            bool isSummer = false;
+            int scenario = AssetPage.SelectedScenario;
 
-            CurrentViewModel = new ResultViewModel(
-                AssetPage.SelectedScenario,
-                AssetPage.IsSummer,
-                AssetPage.GetSelectedUnitNames()
-            );
+            var selectedUnits = AssetPage.GetSelectedUnitNames(scenario);
+
+            CurrentViewModel = new ResultViewModel(AssetPage, scenario, isSummer, selectedUnits);
             return;
-            }
+        }
             
 
         CurrentViewModel = viewName switch

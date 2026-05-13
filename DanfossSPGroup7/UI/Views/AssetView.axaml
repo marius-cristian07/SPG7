@@ -29,8 +29,6 @@
               Content="Scenario 1" Command="{Binding SwitchScenarioCommand}" CommandParameter="1"/>
       <Button FontSize="17" VerticalContentAlignment="Center" Padding="10,0" Height="40" HorizontalAlignment="Stretch"
               Content="Scenario 2" Command="{Binding SwitchScenarioCommand}" CommandParameter="2"/>
-      <CheckBox Content="Click for summer / leave for winter"
-          IsChecked="{Binding IsSummer}" />
     </StackPanel>
 
     <ScrollViewer Grid.Row="1">
@@ -41,7 +39,10 @@
               <Grid ColumnDefinitions="120, *, 200">
 
                 <StackPanel Grid.Column="0">
-                  <Border Width="80" Height="80" Background="White" Margin="0,0,0,5" />
+                  <Image Source="{Binding UnitImage}" 
+                          Width="80" Height="80" 
+                          Margin="0,0,0,5" 
+                          Stretch="UniformToFill"/>
                   <TextBlock Text="{Binding Unit.Name}" FontWeight="Bold" HorizontalAlignment="Center" />
                 </StackPanel>
 
@@ -66,6 +67,13 @@
                             IsChecked="{Binding IsSelectedForMaintenance}"
                             IsEnabled="{Binding CanToggleMaintenance}" />
                   <StackPanel IsVisible="{Binding IsSelectedForMaintenance}">
+                    <TextBlock Text="Start Day" FontSize="10" Foreground="Gray"/>
+                    <ComboBox ItemsSource="{Binding #Root.DataContext.MaintenanceStartDayOptions}"
+                              SelectedIndex="{Binding MaintenanceStartDayIndex, Mode=TwoWay}"
+                              HorizontalAlignment="Stretch"
+                              Margin="0,5,0,10"/>
+                    
+                    <TextBlock Text="Maintenance Duration" FontSize="11" Foreground="Gray"/>
                     <Slider Minimum="30" Maximum="60" Value="{Binding MaintenanceDuration}" />
                     <TextBlock Text="{Binding MaintenanceDuration, StringFormat='{}{0} Hours'}" FontSize="10" HorizontalAlignment="Right"/>
                   </StackPanel>

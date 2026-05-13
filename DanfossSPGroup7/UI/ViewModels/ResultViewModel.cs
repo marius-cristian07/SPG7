@@ -4,8 +4,12 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DanfossSPGroup7.Domain;
 using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView.Painting;
 using LiveChartsCore.SkiaSharpView;
+using CommunityToolkit.Mvvm.Input;
+using SkiaSharp;
 using System.Text;
+
 namespace DanfossSPGroup7.UI.ViewModels;
 
 public partial class ResultViewModel : ObservableObject
@@ -16,46 +20,115 @@ public partial class ResultViewModel : ObservableObject
 
     [ObservableProperty] private ISeries[] heatDemandSeries = Array.Empty<ISeries>();
 
-    public Axis[] XAxes { get; set; } = Array.Empty<Axis>();
+    [ObservableProperty] private ISeries[] co2Series = Array.Empty<ISeries>();
 
+    [ObservableProperty] private ISeries[] netProductionCostSeries = Array.Empty<ISeries>();
+
+    [ObservableProperty] private bool isScenario2;
+    private readonly AssetViewModel? _assetPage;
+    
+
+    public Axis[] XAxes { get; set; } = Array.Empty<Axis>();
     public Axis[] YAxes { get; set; } = Array.Empty<Axis>();
 
     public Axis[] HeatDemandXAxes { get; set; } = Array.Empty<Axis>();
-
     public Axis[] HeatDemandYAxes { get; set; } = Array.Empty<Axis>();
+
+    public Axis[] Co2XAxes { get; set; } = Array.Empty<Axis>();
+    public Axis[] Co2YAxes { get; set; } = Array.Empty<Axis>();
+
+    public Axis[] NetCostXAxes { get; set; } = Array.Empty<Axis>();
+    public Axis[] NetCostYAxes { get; set; } = Array.Empty<Axis>();
 
     private readonly List<string> _allowedUnitNames = new();
 
-    public ResultViewModel()
+    private static SKColor GetUnitColor(string unitName)
     {
-        // Default to Scenario 1, Winter
-        try
+        return unitName switch
         {
-            SetupAxes();
-            SetupHeatDemandAxes();
-            LoadReport(1, false, new List<string> { "GB1", "GB2", "GB3", "OB1" });
-        }
-        catch (Exception ex)
-        {
-            ResultsText = "RESULTS ERROR:\n" + ex.ToString();
-            Series = Array.Empty<ISeries>();
-        }
+            "GB1" => new SKColor(244, 183, 126), // light orange / peach
+            "GB2" => new SKColor(230, 126, 34),  // orange
+            "GB3" => new SKColor(128, 65, 32),   // dark brown / rust
+            "OB1" => new SKColor(128, 128, 128), // gray
+            "GM1" => new SKColor(52, 152, 219),  // blue
+            "EB1" => new SKColor(46, 204, 113),  // green
+            _ => new SKColor(100, 100, 100)
+        };
     }
 
-    public ResultViewModel(int scenarioNumber, bool isSummer, List<string> allowedUnitNames)
+    public ResultViewModel()
     {
         try
         {
             SetupAxes();
             SetupHeatDemandAxes();
-            _allowedUnitNames = allowedUnitNames ?? new List<string>();
-            LoadReport(scenarioNumber, isSummer, _allowedUnitNames);
+            SetupCo2Axes();
+            SetupNetCostAxes();
+
+            LoadReport(1, false, new List<string> { "GB1", "GB2", "GB3", "OB1" });
         }
         catch (Exception ex)
         {
             ResultsText = "RESULTS ERROR:\n" + ex;
             Series = Array.Empty<ISeries>();
         }
+    }
+
+    public ResultViewModel(AssetViewModel assetPage, int scenarioNumber, bool isSummer, List<string> allowedUnitNames)
+    {
+        try
+        {
+            SetupAxes();
+            SetupHeatDemandAxes();
+            SetupCo2Axes();
+            SetupNetCostAxes();
+
+            _assetPage = assetPage;
+            _currentScenario = scenarioNumber;
+            _currentIsSummer = isSummer;
+            _currentUnitNames = allowedUnitNames ?? new List<string>();
+
+            LoadReport(_currentScenario, _currentIsSummer, _currentUnitNames);
+        }
+        catch (Exception ex)
+        {
+            ResultsText = "RESULTS ERROR:\n" + ex;
+            Series = Array.Empty<ISeries>();
+        }
+    }
+
+
+    private int _currentScenario = 1;
+    private bool _currentIsSummer = false;
+    private List<string> _currentUnitNames = new();
+
+    [RelayCommand]
+    public void ChangeScenario(string scenarioNum)
+    {
+        _currentScenario = int.Parse(scenarioNum);
+
+        // when switching scenario, refresh the allowed units from the asset page
+        if (_assetPage != null)
+        {
+            _currentUnitNames = _assetPage.GetSelectedUnitNames(_currentScenario);
+        }
+        else
+        {
+            _currentUnitNames = _currentScenario == 1
+                ? new List<string> { "GB1", "GB2", "GB3", "OB1" }
+                : new List<string> { "GM1", "EB1", "GB1", "GB3" };
+        }
+
+        LoadReport(_currentScenario, _currentIsSummer, _currentUnitNames);
+    }
+
+    [RelayCommand]
+    public void ChangeSeason(string isSummerStr)
+    {
+        _currentIsSummer = bool.Parse(isSummerStr);
+        
+        // Use the same unit list but change the season
+        LoadReport(_currentScenario, _currentIsSummer, _currentUnitNames);
     }
 
     private void SetupAxes()
@@ -76,12 +149,83 @@ public partial class ResultViewModel : ObservableObject
         {
             new Axis
             {
-                Name = "Cost",
-                Labeler = value => $"{value:N0} DKK"
+                Name = "Heat Production (MW)",
+                Labeler = value => $"{value:F1}"
             }
         };
     }
 
+    private void SetupHeatDemandAxes()
+    {
+        HeatDemandXAxes = new Axis[]
+        {
+            new Axis
+            {
+                Name = "Time",
+                UnitWidth = 24,
+                MinStep = 24,
+                ForceStepToMin = true,
+                Labeler = value => $"Day {(int)value / 24 + 1}"
+            }
+        };
+
+        HeatDemandYAxes = new Axis[]
+        {
+            new Axis
+            {
+                Name = "Heat Demand (MW)",
+                Labeler = value => $"{value:F1}"
+            }
+        };
+    }
+
+    private void SetupCo2Axes()
+    {
+        Co2XAxes = new Axis[]
+        {
+            new Axis
+            {
+                Name = "Time",
+                UnitWidth = 24,
+                MinStep = 24,
+                ForceStepToMin = true,
+                Labeler = value => $"Day {(int)value / 24 + 1}"
+            }
+        };
+
+        Co2YAxes = new Axis[]
+        {
+            new Axis
+            {
+                Name = "CO2 Emissions (kg/h)",
+                Labeler = value => $"{value:N0}"
+            }
+        };
+    }
+
+    private void SetupNetCostAxes()
+    {
+        NetCostXAxes = new Axis[]
+        {
+            new Axis
+            {
+                Name = "Time",
+                UnitWidth = 24,
+                MinStep = 24,
+                ForceStepToMin = true,
+                Labeler = value => $"Day {(int)value / 24 + 1}"
+            }
+        };
+
+        NetCostYAxes = new Axis[]
+        {
+            new Axis
+            {
+                Name = "Net Production Cost",
+                Labeler = value => $"{value:N0} DKK/MWh"
+            }
+        };
+    }
 
     private void LoadHeatDemandGraph(bool isSummer, int scenarioNumber)
     {
@@ -91,49 +235,174 @@ public partial class ResultViewModel : ObservableObject
             return;
         }
 
-        var sourceData = isSummer ? Optimizer.Instance.Summer : Optimizer.Instance.Winter;
+        var sourceData = isSummer
+            ? Optimizer.Instance.Summer
+            : Optimizer.Instance.Winter;
 
-        var orderedPoints = sourceData.OrderBy(kvp => kvp.Key).Take(336).ToList();
-
-        var demandValues = orderedPoints.Select(kvp => kvp.Value.HeatDemand).ToArray();
+        var demandValues = sourceData
+            .OrderBy(kvp => kvp.Key)
+            .Take(336)
+            .Select(kvp => kvp.Value.HeatDemand)
+            .ToArray();
 
         HeatDemandSeries = new ISeries[]
         {
-        new LineSeries<double>
-        {
-            Values = demandValues,
-            Name = isSummer? $"Scenario {scenarioNumber} Summer Heat Demand": $"Scenario {scenarioNumber} Winter Heat Demand",
-            GeometrySize = 0
-        }
+            new LineSeries<double>
+            {
+                Values = demandValues,
+                Name = $"Scenario {scenarioNumber} {(isSummer ? "Summer" : "Winter")} Heat Demand",
+                GeometrySize = 0,
+                LineSmoothness = 0.45,
+                Fill = null,
+                Stroke = new SolidColorPaint(SKColors.Black) { StrokeThickness = 5 }
+            }
         };
     }
 
-    private void SetupHeatDemandAxes()
+    private void LoadCo2Graph(
+        bool isSummer,
+        int scenarioNumber,
+        List<(DateTime Hour,
+        List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)> results)
     {
-        HeatDemandXAxes = new Axis[]
-        {
-        new Axis
-        {
-            Name = "Time",
-            UnitWidth = 24,
-            MinStep = 24,
-            ForceStepToMin = true,
-            Labeler = value => $"Day {(int)value / 24 + 1}"
-        }
-        };
+        double[] hourlyCo2 = new double[results.Count];
 
-        HeatDemandYAxes = new Axis[]
+        for (int i = 0; i < results.Count; i++)
         {
-        new Axis
-        {
-            Name = "Heat Demand (MW)",
-            Labeler = value => $"{value:F1}"
+            hourlyCo2[i] = results[i].Schedule.Sum(x => x.HeatMW * x.Co2);
         }
+
+        Co2Series = new ISeries[]
+        {
+            new LineSeries<double>
+            {
+                Values = hourlyCo2,
+                Name = $"Scenario {scenarioNumber} {(isSummer ? "Summer" : "Winter")} CO2",
+                GeometrySize = 0,
+                LineSmoothness = 0.45,
+                Fill = null,
+                Stroke = new SolidColorPaint(new SKColor(110, 110, 110)) { StrokeThickness = 3 }
+            }
         };
+    }
+
+    private void LoadNetProductionCostGraph(
+        bool isSummer,
+        List<(DateTime Hour,
+        List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)> results)
+    {
+        var sourceData = isSummer
+            ? Optimizer.Instance.Summer
+            : Optimizer.Instance.Winter;
+
+        double[] values = new double[results.Count];
+
+        for (int i = 0; i < results.Count; i++)
+        {
+            if (results[i].Schedule.Count == 0)
+            {
+                values[i] = 0;
+                continue;
+            }
+
+            double electricityPrice =
+                sourceData[results[i].Hour].ElectricityPrice;
+
+            double totalHeat = 0;
+            double totalCost = 0;
+
+            foreach (var item in results[i].Schedule)
+            {
+                double netCost =
+                    Optimizer.CalculateNetProductionCost(
+                        item.Unit,
+                        electricityPrice);
+
+                totalHeat += item.HeatMW;
+                totalCost += item.HeatMW * netCost;
+            }
+
+            values[i] = totalHeat > 0 ? totalCost / totalHeat : 0;
+        }
+
+        NetProductionCostSeries = new ISeries[]
+        {
+            new LineSeries<double>
+            {
+                Values = values,
+                Name = "Net Production Cost",
+                GeometrySize = 0,
+                LineSmoothness = 0.45,
+                Fill = null,
+                Stroke = new SolidColorPaint(new SKColor(52, 73, 94)) { StrokeThickness = 3 }
+            }
+        };
+    }
+
+    private ISeries[] BuildHeatProductionSeries(
+        bool isSummer,
+        List<string> allowedUnitNames,
+        List<(DateTime Hour,
+        List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)> results)
+    {
+        var sourceData = isSummer
+            ? Optimizer.Instance!.Summer
+            : Optimizer.Instance!.Winter;
+
+        var unitHeatValues = allowedUnitNames
+            .Distinct()
+            .ToDictionary(unitName => unitName, _ => new double[results.Count]);
+
+        for (int i = 0; i < results.Count; i++)
+        {
+            foreach (var item in results[i].Schedule)
+            {
+                if (unitHeatValues.TryGetValue(item.Unit.Name, out var values))
+                {
+                    values[i] = item.HeatMW;
+                }
+            }
+        }
+
+        var chartSeries = new List<ISeries>();
+
+        foreach (var unitName in allowedUnitNames.Distinct())
+        {
+            var color = GetUnitColor(unitName);
+
+            chartSeries.Add(new StackedAreaSeries<double>
+            {
+                Values = unitHeatValues[unitName],
+                Name = unitName,
+                GeometrySize = 0,
+                LineSmoothness = 0.35,
+                Fill = new SolidColorPaint(color.WithAlpha(150)),
+                Stroke = new SolidColorPaint(color) { StrokeThickness = 2 }
+            });
+        }
+
+        var heatDemandValues = results
+            .Select(result => sourceData[result.Hour].HeatDemand)
+            .ToArray();
+
+        chartSeries.Add(new LineSeries<double>
+        {
+            Values = heatDemandValues,
+            Name = "Heat Demand",
+            GeometrySize = 0,
+            LineSmoothness = 0.45,
+            Fill = null,
+            Stroke = new SolidColorPaint(SKColors.Black) { StrokeThickness = 6 }
+        });
+
+        return chartSeries.ToArray();
     }
 
     public void LoadReport(int scenarioNumber, bool isSummer, List<string> allowedUnitNames)
     {
+
+        IsScenario2 = scenarioNumber == 2;
+
         if (Optimizer.Instance == null)
         {
             ResultsText = "Optimizer is not initialized.";
@@ -141,26 +410,43 @@ public partial class ResultViewModel : ObservableObject
             return;
         }
 
-        if (scenarioNumber != 1)
+        if (_assetPage != null)
         {
-            ResultsText = "Scenario 2 is not implemented yet.";
+            _assetPage.PrepareOptimization(scenarioNumber, isSummer);
+            allowedUnitNames = _assetPage.GetSelectedUnitNames(scenarioNumber);
+            _currentUnitNames = allowedUnitNames;
+        }
+
+        List<(DateTime Hour,
+        List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)> results;
+
+        if (scenarioNumber == 1)
+        {
+            results = Optimizer.Instance.RunScenario1(isSummer, allowedUnitNames);
+        }
+        else if (scenarioNumber == 2)
+        {
+            results = Optimizer.Instance.RunScenario2(isSummer, allowedUnitNames);
+        }
+        else
+        {
+            ResultsText = "Invalid scenario selected.";
             Series = Array.Empty<ISeries>();
             return;
         }
 
-        var results = Optimizer.Instance.RunScenario1(isSummer, allowedUnitNames);
-
-        // Limit to 14 days (336 hours) - the CSV data contains exactly 14 days
         if (results.Count > 336)
         {
             results = results.Take(336).ToList();
         }
 
         var sb = new StringBuilder();
-        sb.AppendLine($"Scenario 1 - {(isSummer ? "Summer" : "Winter")}");
+
+        sb.AppendLine($"Scenario {scenarioNumber} - {(isSummer ? "Summer" : "Winter")}");
+        AppendMaintenanceSummary(sb);
         sb.AppendLine();
 
-        foreach (var hour in results.Where(r => r.Hour >= new DateTime(2026, 1, 7, 0, 0, 0)).Take(96))
+        foreach (var hour in results.Take(96))
         {
             sb.AppendLine($"{hour.Hour:yyyy-MM-dd HH:mm}");
 
@@ -174,30 +460,30 @@ public partial class ResultViewModel : ObservableObject
 
         ResultsText = sb.ToString();
 
-        double[] hourlyCosts = new double[results.Count];
-        double[] hourlyHeatDemand = new double[results.Count];
+        Series = BuildHeatProductionSeries(isSummer, allowedUnitNames, results);
 
-        for (int i = 0; i < results.Count; i++)
+        LoadHeatDemandGraph(isSummer, scenarioNumber);
+        LoadCo2Graph(isSummer, scenarioNumber, results);
+
+        LoadNetProductionCostGraph(isSummer, results);
+    }
+
+    private static void AppendMaintenanceSummary(StringBuilder sb)
+    {
+        if (Optimizer.Instance == null)
+            return;
+
+        var maintenanceUnit = Optimizer.Instance.ProductionUnits
+            .FirstOrDefault(unit => unit.MaintenancePeriods.Any());
+
+        if (maintenanceUnit == null)
         {
-            double totalCostForThisHour = 0;
-
-            foreach (var item in results[i].Schedule)
-            {
-                totalCostForThisHour += item.HeatMW * item.Unit.ProductionCost;
-            }
-
-            hourlyCosts[i] = totalCostForThisHour;
+            sb.AppendLine("Maintenance: none");
+            return;
         }
 
-        Series = new ISeries[]
-        {
-            new LineSeries<double>
-            {
-                Values = hourlyCosts,
-                Name = isSummer ? "Scenario 1 Summer Cost" : "Scenario 1 Winter Cost",
-                GeometrySize = 0
-            }
-        };
-        LoadHeatDemandGraph(isSummer, scenarioNumber);
+        var maintenance = maintenanceUnit.MaintenancePeriods.First();
+        sb.AppendLine(
+            $"Maintenance: {maintenanceUnit.Name} from {maintenance.Start:yyyy-MM-dd HH:mm} to {maintenance.End:yyyy-MM-dd HH:mm}");
     }
 }
