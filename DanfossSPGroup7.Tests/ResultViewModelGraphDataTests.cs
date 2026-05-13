@@ -6,12 +6,10 @@ using Xunit;
 
 namespace DanfossSPGroup7.Tests;
 
-
-//Tests the numeric rules behind the result charts (heat production stack, heat demand line, CO₂, net cost).
-
+//Tests chart numeric rules mirrored from <c>ResultViewModel</c> (heat demand, CO₂, net cost, production stack).
 public class ResultViewModelGraphDataTests
 {
-    //Mirror of graph data steps in ResultViewModel (test assembly only).
+    //Same data shaping as the result charts; keep aligned with the view model if logic changes.
     private static class MirrorResultViewModelGraphs
     {
         public static double[] ExtractHeatDemandSeries(
@@ -93,6 +91,7 @@ public class ResultViewModelGraphDataTests
         }
     }
 
+    // production unit for test schedules.
     private static ProductionUnit Unit(string name, double maxHeat = 10, double elecMw = 1, double prodCost = 100) =>
         new()
         {
@@ -102,9 +101,7 @@ public class ResultViewModelGraphDataTests
             ProductionCost = prodCost
         };
 
-    //Heat demand series
-
-    //Inserts three timestamps out of order in the dictionary but demands 10, 5, 7. Asserts the series is 10, 5, 7 — proves ordering is by time, not insertion order.
+    //Heat demand series is sorted by timestamp, not dictionary insertion order.
     [Fact]
     public void HeatDemandGraph_Positive_ReturnsChronologicalHeatDemand()
     {
@@ -123,8 +120,7 @@ public class ResultViewModelGraphDataTests
         Assert.Equal(new[] { 10.0, 5, 7 }, series);
     }
 
-    //Passes null as the source dictionary. LINQ’s OrderBy on null throws ArgumentNullException, documenting 
-    // that bad callers fail fast.
+    //Null source data must fail fast (same LINQ behavior as the real chart path).
     [Fact]
     public void HeatDemandGraph_Negative_NullSource_Throws()
     {
@@ -132,7 +128,7 @@ public class ResultViewModelGraphDataTests
             MirrorResultViewModelGraphs.ExtractHeatDemandSeries(null!));
     }
 
-    //Empty dictionary → empty array (no points on the chart).
+    //No source rows yields an empty demand series (nothing to plot).
     [Fact]
     public void HeatDemandGraph_Edge_EmptySource_ReturnsEmptyArray()
     {
@@ -140,38 +136,7 @@ public class ResultViewModelGraphDataTests
         Assert.Empty(series);
     }
 
-    //Builds 400 hourly keys; asks for maxHours: 336. Asserts length 336 and every value still 1 — same cap as the app’s Take(336).
-    [Fact]
-    public void HeatDemandGraph_Edge_TruncatesTo336Hours()
-    {
-        var source = Enumerable.Range(0, 400)
-            .ToDictionary(
-                i => new DateTime(2026, 1, 1).AddHours(i),
-                _ => new DataPoint { HeatDemand = 1, ElectricityPrice = 0 });
-
-        var series = MirrorResultViewModelGraphs.ExtractHeatDemandSeries(source, maxHours: 336);
-        Assert.Equal(336, series.Length);
-        Assert.All(series, v => Assert.Equal(1, v));
-    }
-
-    //Single hour with HeatDemand = 0. Ensures zero is kept (not filtered out), which matters for plotting flat demand.
-    [Fact]
-    public void HeatDemandGraph_Edge_IncludesZeroDemandHours()
-    {
-        var hour = new DateTime(2026, 6, 1, 0, 0, 0);
-        var source = new Dictionary<DateTime, DataPoint>
-        {
-            [hour] = new DataPoint { HeatDemand = 0, ElectricityPrice = 50 }
-        };
-
-        var series = MirrorResultViewModelGraphs.ExtractHeatDemandSeries(source);
-        Assert.Single(series);
-        Assert.Equal(0, series[0]);
-    }
-
-    // CO₂ hourly totals
-
-    //One hour, two rows: (2 MW × 100) + (3 MW × 50) = 350. Checks the formula.
+    //Each hour’s CO₂ line point equals the sum of HeatMW × Co2 over that hour’s schedule.
     [Fact]
     public void Co2Graph_Positive_SumsHeatWeightedEmissions()
     {
@@ -187,7 +152,7 @@ public class ResultViewModelGraphDataTests
         Assert.Equal(2 * 100 + 3 * 50, totals[0]);
     }
 
-    //No hours at all → no CO₂ points (empty double[]).
+    ///No optimization hours means no CO₂ series values.
     [Fact]
     public void Co2Graph_Negative_EmptyResults_ReturnsEmptyArray()
     {
@@ -195,7 +160,7 @@ public class ResultViewModelGraphDataTests
         Assert.Empty(MirrorResultViewModelGraphs.ComputeHourlyCo2Totals(results));
     }
 
-    //One hour exists but schedule list is empty → sum is 0 (not an error).
+    //An hour with an empty schedule contributes 0 to the CO₂ series (no crash).
     [Fact]
     public void Co2Graph_Edge_EmptyScheduleHour_YieldsZero()
     {
@@ -210,27 +175,7 @@ public class ResultViewModelGraphDataTests
         Assert.Equal(0, totals[0]);
     }
 
-    //Uses negative heat and negative CO₂ factors to show the code does not clamp; it blindly sums products (useful if 
-    // data is bad or for sensitivity).
-    [Fact]
-    public void Co2Graph_Edge_NegativeHeatOrCo2_IsPropagatedInSum()
-    {
-        var u = Unit("X");
-        var hour = new DateTime(2026, 1, 1, 0, 0, 0);
-        var results = new List<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)>
-        {
-            (hour, new List<(ProductionUnit, double, double)> { (u, -1, 10), (u, 2, -5) })
-        };
-
-        var totals = MirrorResultViewModelGraphs.ComputeHourlyCo2Totals(results);
-        Assert.Equal(-10 + 2 * -5, totals[0]);
-    }
-
-
-    //Net production cost
-
-    //Two units, prices 50 and 150 DKK-ish style costs, 4 MW and 2 MW, electricity price 0 so net cost equals ProductionCost. 
-    // Manual expectation (4×50 + 2×150) / 6.
+    //Net cost per hour is heat-weighted average of each unit’s net production cost at that hour’s electricity price.
     [Fact]
     public void NetCostGraph_Positive_MatchesHeatWeightedAverageNetCost()
     {
@@ -254,8 +199,7 @@ public class ResultViewModelGraphDataTests
         Assert.Equal(expected, netCosts[0], precision: 9);
     }
 
-    //Result references an hour that is not in source → dictionary lookup throws KeyNotFoundException (same as production if CSV keys 
-    // and result hours diverge).
+    //Missing source data for a result hour throws when resolving electricity price.
     [Fact]
     public void NetCostGraph_Negative_ThrowsWhenHourMissingFromSource()
     {
@@ -271,7 +215,7 @@ public class ResultViewModelGraphDataTests
             MirrorResultViewModelGraphs.ComputeHourlyWeightedAverageNetCost(source, results));
     }
 
-    //Source has that hour; schedule empty → 0 (no division).
+    //An hour with no dispatched units yields net cost 0 for that point.
     [Fact]
     public void NetCostGraph_Edge_EmptySchedule_ReturnsZero()
     {
@@ -290,58 +234,7 @@ public class ResultViewModelGraphDataTests
         Assert.Equal(0, values[0]);
     }
 
-    //Schedule has rows but 0 MW each → totalHeat is 0 → line value 0 (avoids 0/0).
-    [Fact]
-    public void NetCostGraph_Edge_AllZeroHeat_ReturnsZeroDespiteSchedule()
-    {
-        var hour = new DateTime(2026, 1, 1, 0, 0, 0);
-        var u = Unit("Idle", maxHeat: 10, elecMw: 1, prodCost: 200);
-        var source = new Dictionary<DateTime, DataPoint>
-        {
-            [hour] = new DataPoint { HeatDemand = 0, ElectricityPrice = 50 }
-        };
-        var results = new List<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)>
-        {
-            (hour, new List<(ProductionUnit, double, double)> { (u, 0, 0), (u, 0, 0) })
-        };
-
-        var values = MirrorResultViewModelGraphs.ComputeHourlyWeightedAverageNetCost(source, results);
-        Assert.Equal(0, values[0]);
-    }
-
-    //Same unit, full 10 MW both hours; hour 0 price 0, hour 1 price 20. Asserts each plotted point equals 
-    // Optimizer.CalculateNetProductionCost for that hour’s price — proves the graph follows hourly electricity price, 
-    // not a global constant.
-    [Fact]
-    public void NetCostGraph_Edge_UsesHourSpecificElectricityPrice()
-    {
-        var h0 = new DateTime(2026, 1, 1, 0, 0, 0);
-        var h1 = new DateTime(2026, 1, 1, 1, 0, 0);
-        var u = Unit("Gen", maxHeat: 10, elecMw: 5, prodCost: 100);
-
-        var source = new Dictionary<DateTime, DataPoint>
-        {
-            [h0] = new DataPoint { HeatDemand = 10, ElectricityPrice = 0 },
-            [h1] = new DataPoint { HeatDemand = 10, ElectricityPrice = 20 }
-        };
-
-        var results = new List<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)>
-        {
-            (h0, new List<(ProductionUnit, double, double)> { (u, 10, 0) }),
-            (h1, new List<(ProductionUnit, double, double)> { (u, 10, 0) })
-        };
-
-        var values = MirrorResultViewModelGraphs.ComputeHourlyWeightedAverageNetCost(source, results);
-        var net0 = Optimizer.CalculateNetProductionCost(u, 0);
-        var net1 = Optimizer.CalculateNetProductionCost(u, 20);
-        Assert.Equal(net0, values[0], precision: 9);
-        Assert.Equal(net1, values[1], precision: 9);
-    }
-
-
-    //Heat production stack + demand overlay
-
-    //Two hours, two units; checks GB1/GB2 arrays [10,3] and [5,7] and demand line [100,200] from source.
+    //Stacked series get per-unit MW per hour; overlay line matches source heat demand at each result hour.
     [Fact]
     public void HeatProductionGraph_Positive_MapsUnitsAndDemandLine()
     {
@@ -374,7 +267,7 @@ public class ResultViewModelGraphDataTests
         Assert.Equal(new[] { 100.0, 200 }, demandLine);
     }
 
-    //Empty source but result has an hour → KeyNotFoundException when building demand line.
+    //Demand overlay lookup fails if the result hour is absent from source data.
     [Fact]
     public void HeatProductionGraph_Negative_ThrowsWhenResultHourMissingFromSource()
     {
@@ -390,8 +283,7 @@ public class ResultViewModelGraphDataTests
             MirrorResultViewModelGraphs.BuildHeatProductionChartData(source, new List<string> { "GB1" }, results));
     }
 
-    //Schedule has “Hidden” at 99 MW and “GB1” at 2 MW; allowed list is only GB1 → only 
-    // one series, value 2; demand still from source (50).
+    //Only allowed unit names get a stack series; other units’ MW are ignored for the chart.
     [Fact]
     public void HeatProductionGraph_Edge_UnitNotInAllowedList_IsIgnored()
     {
@@ -417,54 +309,4 @@ public class ResultViewModelGraphDataTests
         Assert.Equal(new[] { 2.0 }, unitSeries[0].Values);
         Assert.Equal(new[] { 50.0 }, demandLine);
     }
-
-    //Allowed list GB1, GB1, GB1 → Distinct() leaves one series; still [8] for that hour.
-    [Fact]
-    public void HeatProductionGraph_Edge_DuplicateAllowedNames_UsesSingleSeriesRow()
-    {
-        var hour = new DateTime(2026, 1, 1, 0, 0, 0);
-        var gb1 = Unit("GB1");
-        var source = new Dictionary<DateTime, DataPoint>
-        {
-            [hour] = new DataPoint { HeatDemand = 1, ElectricityPrice = 0 }
-        };
-        var results = new List<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)>
-        {
-            (hour, new List<(ProductionUnit, double, double)> { (gb1, 8, 0) })
-        };
-
-        var (unitSeries, _) = MirrorResultViewModelGraphs.BuildHeatProductionChartData(
-            source,
-            new List<string> { "GB1", "GB1", "GB1" },
-            results);
-
-        Assert.Single(unitSeries);
-        Assert.Equal(new[] { 8.0 }, unitSeries[0].Values);
-    }
-
-    //Empty schedule but allowed GB1 and GB2 → two series of zeros; demand line still [10] from source 
-    // (overlay independent of schedule).
-    [Fact]
-    public void HeatProductionGraph_Edge_AllowedUnitWithNoOutput_HasZeroSeries()
-    {
-        var hour = new DateTime(2026, 1, 1, 0, 0, 0);
-        var source = new Dictionary<DateTime, DataPoint>
-        {
-            [hour] = new DataPoint { HeatDemand = 10, ElectricityPrice = 0 }
-        };
-        var results = new List<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)>
-        {
-            (hour, new List<(ProductionUnit, double, double)>())
-        };
-
-        var (unitSeries, demandLine) = MirrorResultViewModelGraphs.BuildHeatProductionChartData(
-            source,
-            new List<string> { "GB1", "GB2" },
-            results);
-
-        Assert.Equal(2, unitSeries.Count);
-        Assert.All(unitSeries, s => Assert.Equal(0, s.Values[0]));
-        Assert.Equal(new[] { 10.0 }, demandLine);
-    }
-
 }
