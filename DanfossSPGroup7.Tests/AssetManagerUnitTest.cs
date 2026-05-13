@@ -40,7 +40,9 @@ namespace SPG7UnitTesting
             var gb1 = units.FirstOrDefault(u => u.Name == "GB1");
 
             Assert.NotNull(gb1);
-            Assert.Equal("Assets/Unit1.png", gb1!.ImagePath);
+            Assert.Equal(
+                "avares://DanfossSPGroup7/Data/AssetManager/Assets/unit1.png",
+                gb1!.ImagePath);
             Assert.Equal(3.0, gb1.MaxHeatMW);
             Assert.Equal(0, gb1.ElectricityMW);
             Assert.Equal(1.05, gb1.EnergyConsumption);

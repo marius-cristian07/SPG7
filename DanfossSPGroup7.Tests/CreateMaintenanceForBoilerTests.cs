@@ -18,9 +18,10 @@ public class CreateMaintenanceForBoilerTests
         var testNameBoiler = "GB1";
         var testDuration = 59;
         var testEndDate = new DateTime(2026, 1, 10, 11, 0, 0);
+        var startDate = testEndDate.AddHours(-testDuration);
 
         // Act
-        sut.CreateMaintenanceForBoiler(testNameBoiler, testDuration, testUnitList);
+        sut.CreateMaintenanceForBoiler(testNameBoiler, testDuration, testUnitList, startDate);
 
         //Assert
         Assert.Equal(testEndDate, testUnitObj.MaintenancePeriods[0].End);
@@ -35,11 +36,11 @@ public class CreateMaintenanceForBoilerTests
         var sut = new MaintenanceCalculation();
         var testNameBoiler = "Banana";
         var testDuration = 59;
-        var testEndDate = new DateTime(2026, 1, 10, 11, 0, 0);
+        var startDate = new DateTime(2026, 1, 1, 0, 0, 0);
 
         // Act
         var exception = Assert.Throws<ArgumentException>(() =>
-        sut.CreateMaintenanceForBoiler(testNameBoiler, testDuration, testUnitList));
+        sut.CreateMaintenanceForBoiler(testNameBoiler, testDuration, testUnitList, startDate));
 
         //Assert
         Assert.Equal($"Boiler '{testNameBoiler}' is not found", exception.Message);
@@ -57,9 +58,10 @@ public class CreateMaintenanceForBoilerTests
         var testNameBoiler = "GB1";
         var testDuration = 70;
         var testEndDate = new DateTime(2026, 1, 10, 22, 0, 0);
+        var startDate = testEndDate.AddHours(-testDuration);
 
         // Act
-        sut.CreateMaintenanceForBoiler(testNameBoiler, testDuration, testUnitList);
+        sut.CreateMaintenanceForBoiler(testNameBoiler, testDuration, testUnitList, startDate);
 
         //Assert
         Assert.Equal(testEndDate, testUnitObj.MaintenancePeriods[0].End);
