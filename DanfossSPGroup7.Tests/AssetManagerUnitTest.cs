@@ -8,6 +8,7 @@ namespace SPG7UnitTesting
 {
     public class AssetManagerTests
     {
+        //Positive case
         [Fact]
         public void GetProductionUnits_ShouldReturnNonNullList()
         {
@@ -17,6 +18,7 @@ namespace SPG7UnitTesting
 
             Assert.NotNull(units);
         }
+        //Positive case
         [Fact]
         public void GetProductionUnits_ShouldContainExpectedUnitNames()
         {
@@ -28,6 +30,7 @@ namespace SPG7UnitTesting
             Assert.Contains(units, u => u.Name == "GM1");
             Assert.Contains(units, u => u.Name == "EB1");
         }
+        //Positive case
         [Fact]
         public void GetProductionUnits_ShouldLoadCorrectDataForGB1()
         {
@@ -37,13 +40,16 @@ namespace SPG7UnitTesting
             var gb1 = units.FirstOrDefault(u => u.Name == "GB1");
 
             Assert.NotNull(gb1);
-            Assert.Equal("Assets/Unit1.png", gb1!.ImagePath);
+            Assert.Equal(
+                "avares://DanfossSPGroup7/Data/AssetManager/Assets/unit1.png",
+                gb1!.ImagePath);
             Assert.Equal(3.0, gb1.MaxHeatMW);
             Assert.Equal(0, gb1.ElectricityMW);
             Assert.Equal(1.05, gb1.EnergyConsumption);
             Assert.Equal(510, gb1.ProductionCost);
             Assert.Equal(132, gb1.CO2Emissions);
         }
+        //Edge case
         [Fact]
         public void GetProductionUnits_AllUnits_ShouldHaveNoMaintenanceByDefault()
         {
@@ -52,6 +58,16 @@ namespace SPG7UnitTesting
             var units = manager.GetProductionUnits();
 
             Assert.All(units, u => Assert.Empty(u.MaintenancePeriods));
+        }
+        //Negative case
+        [Fact]
+        public void GetProductionUnits_ShouldNotContainUnitsWithEmptyNames()
+        {
+            var manager = new AssetManager();
+
+            var units = manager.GetProductionUnits();
+
+            Assert.DoesNotContain(units, u => string.IsNullOrWhiteSpace(u.Name));
         }
     }
 }
