@@ -28,11 +28,6 @@ In this project, all requirements engineering techniques were useful and provide
 
 
 % --------------------------------
-\section{Refactoring}
-
-How did refactoring help your project's code quality, skills balance in
-the group, etc.? (Delete this section if refactoring was not used.)
-% --------------------------------
 \section{Code Review}
 
 Code reviews played an important role in our understanding of the project and how the app works. When somebody was uploading some code, we were reviewing it with all the members so everyone would comprehend the logic and the syntax of the changes. 
@@ -45,21 +40,55 @@ Some challenges we faced were some overlapping parts in the same file or module,
 % --------------------------------
 \section{Testing}
 
-To what extent did testing help the quality of your product? What were
-the disadvantages — e.g.\ slow productivity, intellectually unstimulating
-— and how do you plan to adopt testing in future projects?
+In our product, we used multiple ways of testing which helped with the quality of it. Starting with the Unit Tests, where we checked if the methods and functions work as intended, by isolating them in separate test files. We managed to implement tests for parts of the modules, graphs and crucial parts of the optimizer to make sure everything builds correctly. Functional testing was also used to check if each button works as intended, if we can choose the maintenance period for certain number of hours and the day, as well as switching between scenarios and seasons. Finally, end to end testing assured us that the entire flow and actions of the app work and if the system can be delivered as planned.
+	
+There is a slight disadvantage with testing as it takes a generous amount of time implementing and making sure everything runs smoothly, however the benefits outweigh the drawbacks as having a system that is fully tested with code as well as manually guarantees a better product overall.
+	
+In future projects, we definitely plan to adopt testing, as the more we advance, the more complicated the products are going to be. Bigger and more complex projects mean more chances of it breaking, that is why the bigger the system the more time needs to be spent on testing and making sure every feature runs exactly how it was intended. Without testing a lot of features can break and a lot of bugs can appear out of nowhere, so spending time on testing is a high priority for every system built.
+
 
 % --------------------------------
 \section{Overall Group Reflection}
 
-Include an overall reflection on the project outcome:
+\begin{table}[H]
+    \centering
+    \small
+    \renewcommand{\arraystretch}{1.2}
+    \caption{Requirement fulfillment comparison}
+    \label{tab:requirements-comparison}
+    \begin{tabular}{p{0.17\textwidth} p{0.28\textwidth} p{0.12\textwidth} p{0.33\textwidth}}
+        \toprule
+        \textbf{Requirement Category} & \textbf{Specific Requirement} & \textbf{Status} & \textbf{Comments / Changes Made} \\
+        \midrule
+        Modules & Implement all 5: AM, SDM, RDM, OPT, DV & Fully Met & All modules completed and integrated. \\
+        Scenarios & Scenario 1 (3 gas boilers + 1 oil boiler) + Scenario 2 (2 gas boilers + gas motor + electric boiler) & Fully Met & Both scenarios implemented with correct unit behaviors. \\
+        Time Periods & Winter \& Summer (14-day periods, 1-hour resolution) & Fully Met & Both periods loaded and optimized. \\
+        Maintenance & Obligatory maintenance (30--60 hours) for at least one unit per scenario/period & Fully Met & Configurable via Asset Manager; enforced in Optimizer. \\
+        Optimization Logic & Secure heat demand at all times; minimize net production costs (incl.\ electricity market) & Fully Met & Net production cost calculation implemented; priority-based scheduling. \\
+        Data Handling & Use provided data (unit configs, heat demand, electricity prices) & Fully Met & Loaded from Danfoss files (Excel/CSV). \\
+        Data Storage & AM: local files; SDM: CSV; RDM: CSV & Partially Met & Used only CSV for structure/readability, did not include JSON or other Databases. \\
+        Data Visualization (DV) & Show grid, units, demand, production, electricity, costs, net costs, etc. & Fully Met & Interactive charts and diagrams implemented. \\
+        Project Process & Architecture definition, domain/DTO objects, interfaces, subsystem + integration tests & Mostly Met & Full architecture and interfaces done; comprehensive unit tests; integration test covered main flows (some edge cases limited due to time). \\
+        Additional Exercises & Database, API, unit activation from UI, Energinet API, etc. & Not Done & Did not implement any complex Databases or APIs. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 \begin{itemize}
-    \item Whether all requirements were met or some were changed
-          (e.g.\ a comparison table).
-    \item Whether the product solves the stated issue.
-    \item Whether the product leads to unforeseen problems that would
-          be addressed with future development.
-    \item Possible future development in terms of features, scalability,
-          or other important factors.
+    \item \textbf{Whether the product solves the stated issue.}
+    \par\hspace*{1.5em}The stated issue was that HeatItOn always planned heat production schedules manually, which was difficult when ensuring continuous supply while minimizing production costs, maximizing profit, and handling fluctuating electricity prices and maintenance periods for boilers.
+    \par\hspace*{1.5em}We addressed this issue with our application. Scenario 1 and Scenario 2 correctly prioritize cheaper units and use expensive units mainly during peak hours through net production cost logic in the optimizer. The solution meets heat demand while respecting maintenance periods, and the results are clearly visualized in the Results tab.
+
+
+    \item \textbf{Whether the product leads to unforeseen problems that would be addressed with future development.}
+    \par\hspace*{1.5em}Our optimizer uses a priority-based (greedy) scheduling algorithm based on net production costs. It currently works well for the two scenarios, but it can produce sub-optimal results in more complex situations. With strongly fluctuating electricity prices, a greedy approach may miss more profitable long-term combinations.
+    \par\hspace*{1.5em}For the current 14-day periods, performance is solid. However, scaling to longer periods (for example one year) or multiple heating grids may introduce performance bottlenecks. In parallel, the data visualization module could become cluttered and less readable with larger datasets.
+    \par\hspace*{1.5em}Maintenance periods are also limited in the current version. In a real-world scenario, maintenance rescheduling may be more dynamic, and the current structure would need to be extended.
+
+
+    \item \textbf{Possible future development in terms of features, scalability, or other important factors.}
+    \par\hspace*{1.5em}A strong technical improvement would be replacing the greedy algorithm with a Mixed-Integer Linear Programming solver to handle more complex constraints. Another key feature would be an API client for real-time electricity prices from a Danish source instead of relying only on static CSV data.
+    \par\hspace*{1.5em}A scenario comparison tool would add value by allowing users to evaluate multiple configurations side by side. Data storage could also be upgraded from CSV to a relational database such as PostgreSQL to improve consistency, querying, and historical tracking.
+    \par\hspace*{1.5em}From an operations perspective, an alarm and notification system could warn operators when demand cannot be met or when costs exceed budget thresholds. Additional improvements include PDF reporting with key indicators, deploying the app instead of running it only locally, and adding user-role management plus a mobile dashboard for practical professional use.
+
 \end{itemize}
