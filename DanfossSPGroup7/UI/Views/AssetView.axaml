@@ -11,6 +11,8 @@
     <Style Selector="Button">
       <Setter Property="Background" Value="#B2151B" />
       <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
     </Style>
 
     <Style Selector="Button:pointerover /template/ ContentPresenter">
@@ -18,64 +20,85 @@
       <Setter Property="Foreground" Value="White" />
     </Style>
 
+    <Style Selector="Button.scenarioButton.selected /template/ ContentPresenter">
+      <Setter Property="Background" Value="#5E0C0F" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+
   </UserControl.Styles>
 
   <Border Padding="20">
     
-  <Grid RowDefinitions= "Auto, *">
+  <Grid RowDefinitions= "Auto,Auto,*">
 
     <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="15" Margin="0, 0, 10, 20">
-      <Button FontSize="17" VerticalContentAlignment="Center" Padding="10,0" Height="40" HorizontalAlignment="Stretch"
+      <Button Classes="scenarioButton"
+              Classes.selected="{Binding IsScenario1Selected}"
+              FontSize="17" VerticalContentAlignment="Center" Padding="10,0" Height="40" HorizontalAlignment="Stretch"
               Content="Scenario 1" Command="{Binding SwitchScenarioCommand}" CommandParameter="1"/>
-      <Button FontSize="17" VerticalContentAlignment="Center" Padding="10,0" Height="40" HorizontalAlignment="Stretch"
+      <Button Classes="scenarioButton"
+              Classes.selected="{Binding IsScenario2Selected}"
+              FontSize="17" VerticalContentAlignment="Center" Padding="10,0" Height="40" HorizontalAlignment="Stretch"
               Content="Scenario 2" Command="{Binding SwitchScenarioCommand}" CommandParameter="2"/>
     </StackPanel>
 
-    <ScrollViewer Grid.Row="1">
+    <Border Grid.Row="1"
+            IsVisible="{Binding HasMaintenanceWarning}"
+            Background="#FDECEC"
+            BorderBrush="#E6B6B6"
+            BorderThickness="1"
+            CornerRadius="4"
+            Padding="10"
+            Margin="10,0,10,10">
+      <TextBlock Text="{Binding MaintenanceWarning}"
+                 Foreground="#8B1212"
+                 FontSize="16"
+                 FontWeight="Bold"
+                 TextWrapping="Wrap"/>
+    </Border>
+
+    <ScrollViewer Grid.Row="2">
       <ItemsControl ItemsSource="{Binding DisplayUnits}">
         <ItemsControl.ItemTemplate>
           <DataTemplate>
-            <Border Background="#E0E0E0" Margin="10,5" Padding="15" CornerRadius="4">
-              <Grid ColumnDefinitions="120, *, 200">
+            <Border Background="#F2F4F7" Margin="10,8" Padding="18" CornerRadius="6" BorderBrush="#D9E0EA" BorderThickness="1">
+              <Grid ColumnDefinitions="120, *, 220" ColumnSpacing="22">
 
-                <StackPanel Grid.Column="0">
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
                   <Image Source="{Binding UnitImage}" 
                           Width="80" Height="80" 
                           Margin="0,0,0,5" 
                           Stretch="UniformToFill"/>
-                  <TextBlock Text="{Binding Unit.Name}" FontWeight="Bold" HorizontalAlignment="Center" />
                 </StackPanel>
 
-                <Grid Grid.Column="1" ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto" VerticalAlignment="Center">
-                  <TextBlock Grid.Row="0" Grid.Column="0" Text="Produced Heat" FontSize="10" Foreground="Gray"/>
-                  <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Unit.MaxHeatMW, StringFormat='{}{0} MW'}"/>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
+                  <TextBlock Text="{Binding Unit.Name}" FontWeight="Bold" FontSize="22" Foreground="#1D2A3A" HorizontalAlignment="Left"/>
+                  <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="20">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Produced Heat" FontSize="15" FontWeight="SemiBold" Foreground="#2F4A66"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Unit.MaxHeatMW, StringFormat='{}{0} MW'}" FontSize="18" Foreground="#1D2A3A"/>
                   
-                  <TextBlock Grid.Row="0" Grid.Column="1" Text="Prod. Cost" FontSize="10" Foreground="Gray"/>
-                  <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Unit.ProductionCost, StringFormat='{}{0} DKK'}"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Prod. Cost" FontSize="15" FontWeight="SemiBold" Foreground="#2F4A66"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Unit.ProductionCost, StringFormat='{}{0} DKK'}" FontSize="18" Foreground="#1D2A3A"/>
 
-                  <TextBlock Grid.Row="0" Grid.Column="2" Text="CO2" FontSize="10" Foreground="Gray"/>
-                  <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Unit.CO2Emissions, StringFormat='{}{0} kg'}"/>
-                </Grid>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="CO2" FontSize="15" FontWeight="SemiBold" Foreground="#2F4A66"/>
+                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Unit.CO2Emissions, StringFormat='{}{0} kg'}" FontSize="18" Foreground="#1D2A3A"/>
+                  </Grid>
+                </StackPanel>
 
                 <StackPanel Grid.Column="2" Spacing="5" VerticalAlignment="Center">
-
-                  <CheckBox Content="Include in Optimizer"
-                            IsChecked="{Binding IsActive}"
-                            IsVisible="{Binding IsScenario2}"/>
-
-                  <CheckBox Content="Maintenance Mode" 
-                            IsChecked="{Binding IsSelectedForMaintenance}"
-                            IsEnabled="{Binding CanToggleMaintenance}" />
+                  <CheckBox Content="Maintenance Mode"
+                            FontSize="15"
+                            IsChecked="{Binding IsSelectedForMaintenance}" />
                   <StackPanel IsVisible="{Binding IsSelectedForMaintenance}">
-                    <TextBlock Text="Start Day" FontSize="10" Foreground="Gray"/>
+                    <TextBlock Text="Start Day" FontSize="14" FontWeight="SemiBold" Foreground="#2F4A66"/>
                     <ComboBox ItemsSource="{Binding #Root.DataContext.MaintenanceStartDayOptions}"
                               SelectedIndex="{Binding MaintenanceStartDayIndex, Mode=TwoWay}"
                               HorizontalAlignment="Stretch"
                               Margin="0,5,0,10"/>
                     
-                    <TextBlock Text="Maintenance Duration" FontSize="11" Foreground="Gray"/>
+                    <TextBlock Text="Maintenance Duration" FontSize="14" FontWeight="SemiBold" Foreground="#2F4A66"/>
                     <Slider Minimum="30" Maximum="60" Value="{Binding MaintenanceDuration}" />
-                    <TextBlock Text="{Binding MaintenanceDuration, StringFormat='{}{0} Hours'}" FontSize="10" HorizontalAlignment="Right"/>
+                    <TextBlock Text="{Binding MaintenanceDuration, StringFormat='{}{0} Hours'}" FontSize="14" Foreground="#1D2A3A" HorizontalAlignment="Right"/>
                   </StackPanel>
 
                 </StackPanel>

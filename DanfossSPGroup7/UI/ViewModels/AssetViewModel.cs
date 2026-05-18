@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using DanfossSPGroup7.Data;
 using DanfossSPGroup7.Domain;
 using System;
+using System.Text;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 
@@ -20,6 +21,7 @@ public partial class AssetViewModel : ObservableObject
     private readonly ObservableCollection<UnitConfigViewModel> _scenario2Configs = new();
     [ObservableProperty] private int _selectedScenario = 1; // make the default scenario 1
     [ObservableProperty] private ObservableCollection<UnitConfigViewModel> _displayUnits = new();
+    [ObservableProperty] private string _maintenanceWarning = string.Empty;
     public IReadOnlyList<string> MaintenanceStartDayOptions { get; } =
         new[] { "1st day", "2nd day", "3rd day", "4th day" };
 
@@ -31,7 +33,7 @@ public partial class AssetViewModel : ObservableObject
         var s1Names = new[] { "GB1", "GB2", "GB3", "OB1" };
         foreach (var unit in allUnits.Where(u => s1Names.Contains(u.Name)))
         {
-            _scenario1Configs.Add(new UnitConfigViewModel(unit, this) { IsActive = true, IsScenario2 = false });
+            _scenario1Configs.Add(new UnitConfigViewModel(unit, this));
         }
 
         // scenario 2 config (GM1, EB1, GB1, GB3)
@@ -39,7 +41,7 @@ public partial class AssetViewModel : ObservableObject
         foreach (var unit in allUnits.Where(u => s2Names.Contains(u.Name)))
         {
             // We create NEW instances here so they are independent of Scenario 1
-            _scenario2Configs.Add(new UnitConfigViewModel(unit, this) { IsActive = true, IsScenario2 = true });
+            _scenario2Configs.Add(new UnitConfigViewModel(unit, this));
         }
         LoadScenario(1);
     }
@@ -51,38 +53,13 @@ public partial class AssetViewModel : ObservableObject
         LoadScenario(SelectedScenario);
     }
 
-    [RelayCommand]
-    // disable other maintenance options when one is selected already
-    public void HandleMaintenanceChange()
-    {
-        // check if any unit is already selected for maintenance in the visible scenario
-        var selectedUnit = DisplayUnits.FirstOrDefault(unit => unit.IsSelectedForMaintenance);
-        
-        foreach (var unit in DisplayUnits)
-        {
-            if (selectedUnit == null)
-                unit.CanToggleMaintenance = true;
-            else
-                unit.CanToggleMaintenance = unit == selectedUnit;
-        }
-    }
-
     public void LoadScenario(int scenario)
     {
         SelectedScenario = scenario;
         
         // preserve checkboxes/sliders in the list that is hidden
         DisplayUnits = (scenario == 1) ? _scenario1Configs : _scenario2Configs;
-
-        HandleMaintenanceChange();
-    }
-
-    // bonus requirement logic for results tab to check if scenario2 is modified from default state
-    public bool IsScenario2Modified()
-    {
-        if (SelectedScenario != 2) return false;
-        // check if any unit that is by default ON is turned OFF
-        return DisplayUnits.Any(unit => !unit.IsActive);
+        RefreshMaintenanceWarning();
     }
 
     public List<string> GetSelectedUnitNames()
@@ -95,10 +72,26 @@ public partial class AssetViewModel : ObservableObject
         var configs = GetScenarioConfigs(scenario);
 
         return configs
-            .Where(unit => unit.IsActive)
             .Select(unit => unit.Unit.Name)
             .ToList();
     }
+
+    public bool IsScenario1Selected => SelectedScenario == 1;
+    public bool IsScenario2Selected => SelectedScenario == 2;
+
+    partial void OnSelectedScenarioChanged(int value)
+    {
+        OnPropertyChanged(nameof(IsScenario1Selected));
+        OnPropertyChanged(nameof(IsScenario2Selected));
+        RefreshMaintenanceWarning();
+    }
+
+    partial void OnMaintenanceWarningChanged(string value)
+    {
+        OnPropertyChanged(nameof(HasMaintenanceWarning));
+    }
+
+    public bool HasMaintenanceWarning => !string.IsNullOrWhiteSpace(MaintenanceWarning);
 
     private ObservableCollection<UnitConfigViewModel> GetScenarioConfigs(int scenario)
     {
@@ -121,10 +114,7 @@ public partial class AssetViewModel : ObservableObject
 
         public ProductionUnit Unit {get; set;}
         public Bitmap UnitImage { get; }
-        [ObservableProperty] private bool _isActive;
-        [ObservableProperty] private bool _isScenario2;
         [ObservableProperty] private bool _isSelectedForMaintenance;
-        [ObservableProperty] private bool _canToggleMaintenance = true; // default for every unit
         [ObservableProperty] private int _maintenanceDuration = 30; // by default we select the minimum
         [ObservableProperty] private int _maintenanceStartDayIndex;
         private int _lastValidMaintenanceStartDayIndex;
@@ -138,8 +128,7 @@ public partial class AssetViewModel : ObservableObject
 
         partial void OnIsSelectedForMaintenanceChanged(bool value)
         {
-            // Notify parent to update maintenance lock when checkbox changes
-            _parent?.HandleMaintenanceChange();
+            _parent?.RefreshMaintenanceWarning();
         }
 
         partial void OnMaintenanceStartDayIndexChanged(int value)
@@ -151,6 +140,12 @@ public partial class AssetViewModel : ObservableObject
             }
 
             _lastValidMaintenanceStartDayIndex = Math.Clamp(value, 0, 3);
+            _parent?.RefreshMaintenanceWarning();
+        }
+
+        partial void OnMaintenanceDurationChanged(int value)
+        {
+            _parent?.RefreshMaintenanceWarning();
         }
     }
 
@@ -166,16 +161,12 @@ public partial class AssetViewModel : ObservableObject
             unit.ClearMaintenance();
         }
 
-        // see which units are active based on the scenario
-        var activeConfigs = GetScenarioConfigs(scenario);
+        var scenarioConfigs = GetScenarioConfigs(scenario);
+        var selectedUnits = scenarioConfigs.Where(unit => unit.IsSelectedForMaintenance).ToList();
 
-        // finds the unit where the user checked the maintenance box and apply its specific date and duration
-        var selectedUnit = activeConfigs.FirstOrDefault(unit => unit.IsSelectedForMaintenance);
-
-        if (selectedUnit != null)
+        foreach (var selectedUnit in selectedUnits)
         {
             int selectedDayOffset = Math.Clamp(selectedUnit.MaintenanceStartDayIndex, 0, 3);
-
             DateTime startDate = GetSourceStartDate(isSummer).AddDays(selectedDayOffset);
 
             _calculator.CreateMaintenanceForBoiler(
@@ -184,6 +175,102 @@ public partial class AssetViewModel : ObservableObject
                 Optimizer.Instance.ProductionUnits,
                 startDate
             );
+        }
+
+        RefreshMaintenanceWarning();
+    }
+
+    private void RefreshMaintenanceWarning()
+    {
+        MaintenanceWarning = BuildMaintenanceWarning(SelectedScenario);
+    }
+
+    private string BuildMaintenanceWarning(int scenario)
+    {
+        if (Optimizer.Instance == null)
+            return string.Empty;
+
+        var scenarioConfigs = GetScenarioConfigs(scenario).ToList();
+        var selectedMaintenances = scenarioConfigs
+            .Where(unit => unit.IsSelectedForMaintenance)
+            .ToList();
+
+        if (selectedMaintenances.Count == 0)
+            return string.Empty;
+
+        var seasonalWarnings = new List<string>();
+        TryBuildSeasonWarning(
+            Optimizer.Instance.Winter,
+            scenarioConfigs,
+            selectedMaintenances,
+            $"Scenario {scenario} winter",
+            seasonalWarnings);
+        TryBuildSeasonWarning(
+            Optimizer.Instance.Summer,
+            scenarioConfigs,
+            selectedMaintenances,
+            $"Scenario {scenario} summer",
+            seasonalWarnings);
+
+        if (seasonalWarnings.Count == 0)
+            return string.Empty;
+
+        var sb = new StringBuilder("Warning: selected maintenance can leave heat demand unmet.");
+        foreach (var warning in seasonalWarnings)
+        {
+            sb.Append(' ');
+            sb.Append(warning);
+        }
+
+        return sb.ToString();
+    }
+
+    private static void TryBuildSeasonWarning(
+        IReadOnlyDictionary<DateTime, DataPoint> sourceData,
+        IReadOnlyList<UnitConfigViewModel> scenarioConfigs,
+        IReadOnlyList<UnitConfigViewModel> selectedMaintenances,
+        string label,
+        ICollection<string> warnings)
+    {
+        if (sourceData.Count == 0)
+            return;
+
+        var seasonStart = sourceData.Keys.Min().Date;
+        var maintenanceWindows = selectedMaintenances.ToDictionary(
+            unit => unit.Unit.Name,
+            unit =>
+            {
+                var start = seasonStart.AddDays(Math.Clamp(unit.MaintenanceStartDayIndex, 0, 3));
+                var end = start.AddHours(unit.MaintenanceDuration);
+                return (Start: start, End: end);
+            });
+
+        double maxShortage = 0;
+        DateTime worstHour = default;
+
+        foreach (var hour in sourceData.OrderBy(item => item.Key))
+        {
+            var availableCapacity = scenarioConfigs.Sum(config =>
+            {
+                if (!maintenanceWindows.TryGetValue(config.Unit.Name, out var window))
+                    return config.Unit.MaxHeatMW;
+
+                var inMaintenance = hour.Key >= window.Start && hour.Key < window.End;
+                return inMaintenance ? 0 : config.Unit.MaxHeatMW;
+            });
+
+            var shortage = hour.Value.HeatDemand - availableCapacity;
+            if (shortage > maxShortage)
+            {
+                maxShortage = shortage;
+                worstHour = hour.Key;
+            }
+        }
+
+        if (maxShortage > 0)
+        {
+            warnings.Add(
+                $"{label}: worst shortage {maxShortage:F1} MW at {worstHour:yyyy-MM-dd HH:mm}.");
         }
     }
 }

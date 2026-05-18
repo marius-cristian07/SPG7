@@ -9,6 +9,23 @@
 
     <Window.Styles>
         <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#8F1A1A" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
+        <Style Selector="Button.tabButton">
+            <Setter Property="Background" Value="#BA0303" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+
+        <Style Selector="Button.tabButton:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#8F1A1A" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
+        <Style Selector="Button.tabButton.selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="#6D1111" />
             <Setter Property="Foreground" Value="White" />
         </Style>
     </Window.Styles>
@@ -19,13 +36,19 @@
     <!-- Sidebar, column 0 -->
     <StackPanel Grid.Column="0" Background="#BA0303">
 
-        <Border Height="60" Background="#881717" Padding="15" HorizontalAlignment="Stretch">
+        <Border Height="60" Background="#BA0303" Padding="15" HorizontalAlignment="Stretch">
         <TextBlock Foreground="#FFFFFF" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" TextAlignment="Center">HeatItOn</TextBlock>
         </Border>
         
-        <Button Foreground="#FFFFFF" FontSize="19" VerticalContentAlignment="Center" Padding="20,0" Height="60" HorizontalAlignment="Stretch" Content="Asset Manager" Command="{Binding NavigateCommand}" CommandParameter="Asset" Margin="0,3,0,0" />
-        <Button Foreground="#FFFFFF" FontSize="19" VerticalContentAlignment="Center" Padding="20,0" Height="60" HorizontalAlignment="Stretch" Content="Data" Command="{Binding NavigateCommand}" CommandParameter="Dashboard" />
-        <Button Foreground="#FFFFFF" FontSize="19" VerticalContentAlignment="Center" Padding="20,0" Height="60" HorizontalAlignment="Stretch" Content="Results" Command="{Binding NavigateCommand}" CommandParameter="Result" />
+        <Button Classes="tabButton"
+                Classes.selected="{Binding IsAssetTabSelected}"
+                Foreground="#FFFFFF" FontSize="19" VerticalContentAlignment="Center" Padding="20,0" Height="60" HorizontalAlignment="Stretch" Content="Asset Manager" Command="{Binding NavigateCommand}" CommandParameter="Asset" />
+        <Button Classes="tabButton"
+                Classes.selected="{Binding IsDashboardTabSelected}"
+                Foreground="#FFFFFF" FontSize="19" VerticalContentAlignment="Center" Padding="20,0" Height="60" HorizontalAlignment="Stretch" Content="Data" Command="{Binding NavigateCommand}" CommandParameter="Dashboard" />
+        <Button Classes="tabButton"
+                Classes.selected="{Binding IsResultTabSelected}"
+                Foreground="#FFFFFF" FontSize="19" VerticalContentAlignment="Center" Padding="20,0" Height="60" HorizontalAlignment="Stretch" Content="Results" Command="{Binding NavigateCommand}" CommandParameter="Result" />
 
     </StackPanel>
 
