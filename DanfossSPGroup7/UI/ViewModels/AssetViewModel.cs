@@ -127,6 +127,7 @@ public partial class AssetViewModel : ObservableObject
         [ObservableProperty] private bool _canToggleMaintenance = true; // default for every unit
         [ObservableProperty] private int _maintenanceDuration = 30; // by default we select the minimum
         [ObservableProperty] private int _maintenanceStartDayIndex;
+        private int _lastValidMaintenanceStartDayIndex;
 
         public UnitConfigViewModel(ProductionUnit unit, AssetViewModel? parent = null) 
         { 
@@ -139,6 +140,17 @@ public partial class AssetViewModel : ObservableObject
         {
             // Notify parent to update maintenance lock when checkbox changes
             _parent?.HandleMaintenanceChange();
+        }
+
+        partial void OnMaintenanceStartDayIndexChanged(int value)
+        {
+            if (value < 0)
+            {
+                MaintenanceStartDayIndex = _lastValidMaintenanceStartDayIndex;
+                return;
+            }
+
+            _lastValidMaintenanceStartDayIndex = Math.Clamp(value, 0, 3);
         }
     }
 
