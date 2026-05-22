@@ -5,27 +5,47 @@
              x:Class="DanfossSPGroup7.UI.Views.ResultView"
              x:DataType="vm:ResultViewModel"
              Background="White">
+    <UserControl.Styles>
+        <Style Selector="Button">
+            <Setter Property="Background" Value="#B2151B" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="14,7" />
+            <Setter Property="FontSize" Value="15" />
+        </Style>
+
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#820F13" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
+        <Style Selector="Button.selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="#5E0C0F" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </UserControl.Styles>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
 
         
-        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
               Margin="20">
 
             <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#F5F5F5" Spacing="20" Margin="0,0,0,20">
                 <StackPanel Spacing="5">
-                    <TextBlock Text="Scenarios" FontWeight="Bold"/>
+                    <TextBlock Text="Scenarios" FontWeight="Bold" FontSize="16"/>
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <Button Content="Scenario 1" Command="{Binding ChangeScenarioCommand}" CommandParameter="1"/>
-                        <Button Content="Scenario 2" Command="{Binding ChangeScenarioCommand}" CommandParameter="2"/>
+                        <Button Classes.selected="{Binding IsScenario1Selected}" Content="Scenario 1" Command="{Binding ChangeScenarioCommand}" CommandParameter="1"/>
+                        <Button Classes.selected="{Binding IsScenario2Selected}" Content="Scenario 2" Command="{Binding ChangeScenarioCommand}" CommandParameter="2"/>
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel Spacing="5">
-                    <TextBlock Text="Season" FontWeight="Bold"/>
+                    <TextBlock Text="Season" FontWeight="Bold" FontSize="16"/>
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <Button Content="Winter" Command="{Binding ChangeSeasonCommand}" CommandParameter="False"/>
-                        <Button Content="Summer" Command="{Binding ChangeSeasonCommand}" CommandParameter="True"/>
+                        <Button Classes.selected="{Binding IsWinterSelected}" Content="Winter" Command="{Binding ChangeSeasonCommand}" CommandParameter="False"/>
+                        <Button Classes.selected="{Binding IsSummerSelected}" Content="Summer" Command="{Binding ChangeSeasonCommand}" CommandParameter="True"/>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
@@ -89,14 +109,19 @@
                                LegendPosition="Top"
                                Height="300"/>
 
-            
-            <TextBox Grid.Row="10"
-                     Margin="0,12,0,0"
-                     Text="{Binding ResultsText}"
-                     IsReadOnly="True"
-                     AcceptsReturn="True"
-                     TextWrapping="Wrap"
-                     MinHeight="200"/>
+            <TextBlock Grid.Row="10"
+                       Text="Electricity Price"
+                       FontSize="24"
+                       Margin="0,20,0,10"
+                       IsVisible="{Binding IsScenario2}"/>
+
+            <lvc:CartesianChart Grid.Row="11"
+                                Series="{Binding ElectricitySeries}"
+                                XAxes="{Binding ElectricityXAxes}"
+                                YAxes="{Binding ElectricityYAxes}"
+                                LegendPosition="Top"
+                                Height="300"
+                                IsVisible="{Binding IsScenario2}"/>
 
         </Grid>
     </ScrollViewer>

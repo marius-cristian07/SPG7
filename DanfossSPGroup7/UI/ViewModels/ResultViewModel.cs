@@ -23,10 +23,13 @@ public partial class ResultViewModel : ObservableObject
     [ObservableProperty] private ISeries[] co2Series = Array.Empty<ISeries>();
 
     [ObservableProperty] private ISeries[] netProductionCostSeries = Array.Empty<ISeries>();
+    [ObservableProperty] private ISeries[] electricitySeries = Array.Empty<ISeries>();
 
     [ObservableProperty] private bool isScenario2;
     private readonly AssetViewModel? _assetPage;
-    
+
+    [ObservableProperty] private int currentScenario = 1;
+    [ObservableProperty] private bool currentIsSummer;
 
     public Axis[] XAxes { get; set; } = Array.Empty<Axis>();
     public Axis[] YAxes { get; set; } = Array.Empty<Axis>();
@@ -39,8 +42,8 @@ public partial class ResultViewModel : ObservableObject
 
     public Axis[] NetCostXAxes { get; set; } = Array.Empty<Axis>();
     public Axis[] NetCostYAxes { get; set; } = Array.Empty<Axis>();
-
-    private readonly List<string> _allowedUnitNames = new();
+    public Axis[] ElectricityXAxes { get; set; } = Array.Empty<Axis>();
+    public Axis[] ElectricityYAxes { get; set; } = Array.Empty<Axis>();
 
     private static SKColor GetUnitColor(string unitName)
     {
@@ -64,6 +67,7 @@ public partial class ResultViewModel : ObservableObject
             SetupHeatDemandAxes();
             SetupCo2Axes();
             SetupNetCostAxes();
+            SetupElectricityAxes();
 
             LoadReport(1, false, new List<string> { "GB1", "GB2", "GB3", "OB1" });
         }
@@ -82,13 +86,14 @@ public partial class ResultViewModel : ObservableObject
             SetupHeatDemandAxes();
             SetupCo2Axes();
             SetupNetCostAxes();
+            SetupElectricityAxes();
 
             _assetPage = assetPage;
-            _currentScenario = scenarioNumber;
-            _currentIsSummer = isSummer;
+            CurrentScenario = scenarioNumber;
+            CurrentIsSummer = isSummer;
             _currentUnitNames = allowedUnitNames ?? new List<string>();
 
-            LoadReport(_currentScenario, _currentIsSummer, _currentUnitNames);
+            LoadReport(CurrentScenario, CurrentIsSummer, _currentUnitNames);
         }
         catch (Exception ex)
         {
@@ -98,37 +103,53 @@ public partial class ResultViewModel : ObservableObject
     }
 
 
-    private int _currentScenario = 1;
-    private bool _currentIsSummer = false;
     private List<string> _currentUnitNames = new();
 
     [RelayCommand]
     public void ChangeScenario(string scenarioNum)
     {
-        _currentScenario = int.Parse(scenarioNum);
+        CurrentScenario = int.Parse(scenarioNum);
 
         // when switching scenario, refresh the allowed units from the asset page
         if (_assetPage != null)
         {
-            _currentUnitNames = _assetPage.GetSelectedUnitNames(_currentScenario);
+            _currentUnitNames = _assetPage.GetSelectedUnitNames(CurrentScenario);
         }
         else
         {
-            _currentUnitNames = _currentScenario == 1
+            _currentUnitNames = CurrentScenario == 1
                 ? new List<string> { "GB1", "GB2", "GB3", "OB1" }
                 : new List<string> { "GM1", "EB1", "GB1", "GB3" };
         }
 
-        LoadReport(_currentScenario, _currentIsSummer, _currentUnitNames);
+        LoadReport(CurrentScenario, CurrentIsSummer, _currentUnitNames);
     }
 
     [RelayCommand]
     public void ChangeSeason(string isSummerStr)
     {
-        _currentIsSummer = bool.Parse(isSummerStr);
+        CurrentIsSummer = bool.Parse(isSummerStr);
         
         // Use the same unit list but change the season
-        LoadReport(_currentScenario, _currentIsSummer, _currentUnitNames);
+        LoadReport(CurrentScenario, CurrentIsSummer, _currentUnitNames);
+    }
+
+    public bool IsScenario1Selected => CurrentScenario == 1;
+    public bool IsScenario2Selected => CurrentScenario == 2;
+    public bool IsWinterSelected => !CurrentIsSummer;
+    public bool IsSummerSelected => CurrentIsSummer;
+
+    partial void OnCurrentScenarioChanged(int value)
+    {
+        IsScenario2 = value == 2;
+        OnPropertyChanged(nameof(IsScenario1Selected));
+        OnPropertyChanged(nameof(IsScenario2Selected));
+    }
+
+    partial void OnCurrentIsSummerChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsWinterSelected));
+        OnPropertyChanged(nameof(IsSummerSelected));
     }
 
     private void SetupAxes()
@@ -223,6 +244,30 @@ public partial class ResultViewModel : ObservableObject
             {
                 Name = "Net Production Cost",
                 Labeler = value => $"{value:N0} DKK/MWh"
+            }
+        };
+    }
+
+    private void SetupElectricityAxes()
+    {
+        ElectricityXAxes = new Axis[]
+        {
+            new Axis
+            {
+                Name = "Time",
+                UnitWidth = 24,
+                MinStep = 24,
+                ForceStepToMin = true,
+                Labeler = value => $"Day {(int)value / 24 + 1}"
+            }
+        };
+
+        ElectricityYAxes = new Axis[]
+        {
+            new Axis
+            {
+                Name = "Electricity Price (DKK/MWh)",
+                Labeler = value => $"{value:N0}"
             }
         };
     }
@@ -339,6 +384,38 @@ public partial class ResultViewModel : ObservableObject
         };
     }
 
+    private void LoadElectricityGraph(bool isSummer, int scenarioNumber)
+    {
+        if (Optimizer.Instance == null || scenarioNumber != 2)
+        {
+            ElectricitySeries = Array.Empty<ISeries>();
+            return;
+        }
+
+        var sourceData = isSummer
+            ? Optimizer.Instance.Summer
+            : Optimizer.Instance.Winter;
+
+        var electricityValues = sourceData
+            .OrderBy(kvp => kvp.Key)
+            .Take(336)
+            .Select(kvp => kvp.Value.ElectricityPrice)
+            .ToArray();
+
+        ElectricitySeries = new ISeries[]
+        {
+            new LineSeries<double>
+            {
+                Values = electricityValues,
+                Name = $"Scenario {scenarioNumber} {(isSummer ? "Summer" : "Winter")} Electricity Price",
+                GeometrySize = 0,
+                LineSmoothness = 0.45,
+                Fill = null,
+                Stroke = new SolidColorPaint(new SKColor(214, 137, 16)) { StrokeThickness = 3 }
+            }
+        };
+    }
+
     private ISeries[] BuildHeatProductionSeries(
         bool isSummer,
         List<string> allowedUnitNames,
@@ -400,8 +477,8 @@ public partial class ResultViewModel : ObservableObject
 
     public void LoadReport(int scenarioNumber, bool isSummer, List<string> allowedUnitNames)
     {
-
-        IsScenario2 = scenarioNumber == 2;
+        CurrentScenario = scenarioNumber;
+        CurrentIsSummer = isSummer;
 
         if (Optimizer.Instance == null)
         {
@@ -466,6 +543,7 @@ public partial class ResultViewModel : ObservableObject
         LoadCo2Graph(isSummer, scenarioNumber, results);
 
         LoadNetProductionCostGraph(isSummer, results);
+        LoadElectricityGraph(isSummer, scenarioNumber);
     }
 
     private static void AppendMaintenanceSummary(StringBuilder sb)
@@ -473,17 +551,24 @@ public partial class ResultViewModel : ObservableObject
         if (Optimizer.Instance == null)
             return;
 
-        var maintenanceUnit = Optimizer.Instance.ProductionUnits
-            .FirstOrDefault(unit => unit.MaintenancePeriods.Any());
+        var maintenanceUnits = Optimizer.Instance.ProductionUnits
+            .Where(unit => unit.MaintenancePeriods.Any())
+            .ToList();
 
-        if (maintenanceUnit == null)
+        if (maintenanceUnits.Count == 0)
         {
             sb.AppendLine("Maintenance: none");
             return;
         }
 
-        var maintenance = maintenanceUnit.MaintenancePeriods.First();
-        sb.AppendLine(
-            $"Maintenance: {maintenanceUnit.Name} from {maintenance.Start:yyyy-MM-dd HH:mm} to {maintenance.End:yyyy-MM-dd HH:mm}");
+        sb.AppendLine("Maintenance:");
+        foreach (var unit in maintenanceUnits)
+        {
+            foreach (var maintenance in unit.MaintenancePeriods)
+            {
+                sb.AppendLine(
+                    $"  {unit.Name}: {maintenance.Start:yyyy-MM-dd HH:mm} to {maintenance.End:yyyy-MM-dd HH:mm}");
+            }
+        }
     }
 }

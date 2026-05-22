@@ -9,6 +9,11 @@ public partial class MainViewModel : ObservableObject
 {
     public AssetViewModel AssetPage {get;} = new AssetViewModel();
     [ObservableProperty] private ObservableObject? _currentViewModel;
+    [ObservableProperty] private string _selectedTab = "Asset";
+
+    public bool IsAssetTabSelected => SelectedTab == "Asset";
+    public bool IsDashboardTabSelected => SelectedTab == "Dashboard";
+    public bool IsResultTabSelected => SelectedTab == "Result";
 
     public MainViewModel()
     {
@@ -18,6 +23,8 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void Navigate(string viewName)
     {   
+        SelectedTab = viewName;
+
         if (viewName == "Result")
         {
             bool isSummer = false;
@@ -36,5 +43,12 @@ public partial class MainViewModel : ObservableObject
             "Asset" => AssetPage,
             _ => CurrentViewModel
         };
+    }
+
+    partial void OnSelectedTabChanged(string value)
+    {
+        OnPropertyChanged(nameof(IsAssetTabSelected));
+        OnPropertyChanged(nameof(IsDashboardTabSelected));
+        OnPropertyChanged(nameof(IsResultTabSelected));
     }
 }
