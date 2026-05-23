@@ -162,7 +162,7 @@ public partial class ResultViewModel : ObservableObject
                 UnitWidth = 24,
                 MinStep = 24,
                 ForceStepToMin = true,
-                Labeler = value => $"Day {(int)value / 24 + 1}"
+                Labeler = BuildDayDateLabel
             }
         };
 
@@ -186,7 +186,7 @@ public partial class ResultViewModel : ObservableObject
                 UnitWidth = 24,
                 MinStep = 24,
                 ForceStepToMin = true,
-                Labeler = value => $"Day {(int)value / 24 + 1}"
+                Labeler = BuildDayDateLabel
             }
         };
 
@@ -210,7 +210,7 @@ public partial class ResultViewModel : ObservableObject
                 UnitWidth = 24,
                 MinStep = 24,
                 ForceStepToMin = true,
-                Labeler = value => $"Day {(int)value / 24 + 1}"
+                Labeler = BuildDayDateLabel
             }
         };
 
@@ -234,7 +234,7 @@ public partial class ResultViewModel : ObservableObject
                 UnitWidth = 24,
                 MinStep = 24,
                 ForceStepToMin = true,
-                Labeler = value => $"Day {(int)value / 24 + 1}"
+                Labeler = BuildDayDateLabel
             }
         };
 
@@ -258,7 +258,7 @@ public partial class ResultViewModel : ObservableObject
                 UnitWidth = 24,
                 MinStep = 24,
                 ForceStepToMin = true,
-                Labeler = value => $"Day {(int)value / 24 + 1}"
+                Labeler = BuildDayDateLabel
             }
         };
 
@@ -270,6 +270,30 @@ public partial class ResultViewModel : ObservableObject
                 Labeler = value => $"{value:N0}"
             }
         };
+    }
+
+    private string BuildDayDateLabel(double value)
+    {
+        int dayIndex = (int)value / 24;
+        int dayNumber = dayIndex + 1;
+
+        if (Optimizer.Instance == null)
+        {
+            return $"Day {dayNumber}";
+        }
+
+        var sourceData = CurrentIsSummer
+            ? Optimizer.Instance.Summer
+            : Optimizer.Instance.Winter;
+
+        if (sourceData.Count == 0)
+        {
+            return $"Day {dayNumber}";
+        }
+
+        var startDate = sourceData.Keys.Min().Date;
+        var dayDate = startDate.AddDays(dayIndex);
+        return $"Day {dayNumber}\r\n({dayDate:dd/MM})";
     }
 
     private void LoadHeatDemandGraph(bool isSummer, int scenarioNumber)

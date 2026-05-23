@@ -1,4 +1,4 @@
-
+﻿
 \chapter{Team Contributions}
 Table of precise contributions of each team member for both the report
 and the development part.
@@ -10,9 +10,12 @@ and the development part.
         \textbf{Student} & \textbf{Report Contributions} &
         \textbf{Development Contributions} \\
         \midrule
-        Student 1 & & \\
-        Student 2 & & \\
-        Student 3 & & \\
+        Daniil Miadzvetski & Chapter 3 & AM and Production Units, Heat Demand graphs, Unit Tests for AM \\
+        Marius Cristian Para & Chapter 6, Front Page, Table of Contents & Net Production Cost, CO2/Electricity graph, final UI changes, Unit Tests for graphs \\
+        Ivan Rosancic & Chapter 5 & Optimizer Logic (Scenario 1 and 2), CO2/Net Production Cost graphs, Unit Tests for the Scenarios \\
+        Martin Smolek & AI Usage, Chapter 1, Chapter 7, Abstract & SDM, CSV files configuration, created Report environment\\
+        Edris Fiazi & Chapter 4 (Diagrams) & Maintenance domain and Availability checks, Unit Tests for boilers\\
+        Maxim Buciumas & Chapter 4 (Architecture), Chapter 2 & Whole UI(graphs, tabs, boilers, buttons), Unit Tests for UI\\
         \bottomrule
     \end{tabular}
     \caption{Team Contribution Overview}
@@ -21,21 +24,115 @@ and the development part.
 
 \chapter{Meeting Logs}
 
-Include all meeting logs here: Scrum planning, stand-up meetings, Scrum
-review, and retrospective logs that were not included in the main body.
+\section*{Detailed Date-by-Date Log}
+The following log keeps the date, sprint, meeting type, and summary of what happened.
+
+\begingroup
+\small
+\sloppy
+\begin{itemize}[leftmargin=*,itemsep=0.5em]
+\item \textbf{11 Feb 2026} (\textit{Pre-Sprint}) - \textbf{Initial planning discussion}: Team discussed first project meeting agenda: understand project goal, clarify Scenario 1/2, identify objects, sketch architecture, define epics, agree Sprint 1 goal and roles
+\item \textbf{13 Feb 2026} (\textit{Pre-Sprint}) - \textbf{Tool setup}: Team started collecting GitHub/Jira usernames and emails
+\item \textbf{17 Feb 2026} (\textit{Pre-Sprint}) - \textbf{First planning meeting}: Team discussed sprint structure: Sprint 0 tools, Sprint 1 architecture, Sprint 2 Scenario 1, Sprint 3 testing, Sprint 4 Scenario 2, Sprint 5 testing, Sprint 6 report
+\item \textbf{19 Feb 2026} (\textit{Pre-Sprint}) - \textbf{GitHub progress}: Base three-layer project structure was pushed to GitHub
+\item \textbf{20 Feb 2026} (\textit{Pre-Sprint / Supervisor setup}) - \textbf{Supervisor group created}: Group with TA/supervisor was created; initial todo list included requirements, UML, tech stack, prototype, user testing
+\item \textbf{23 Feb 2026} (\textit{Sprint 0}) - \textbf{Sprint start / supervisor preparation}: Sprint 0 started in Jira. Team discussed whether to meet online and what to show supervisor
+\item \textbf{24 Feb 2026} (\textit{Sprint 0}) - \textbf{Supervisor meeting}: Team had online meeting with Alan. Discussion was short but focused on feedback and next steps
+\item \textbf{24 Feb 2026} (\textit{Sprint 0}) - \textbf{Jira updates}: Sprint 0 items were removed and re-added in Jira, then completed: draft product look, architecture, UI structure, UML class
+\item \textbf{25 Feb 2026} (\textit{Sprint 0 / Sprint 1 preparation}) - \textbf{Sprint planning v2}: Team listed todos: requirements, high-level sorting, users, UML, tech stack, Figma prototype, user testing
+\item \textbf{25 Feb 2026} (\textit{Sprint 0}) - \textbf{Sprint completed}: Sprint 0 completed in Jira
+\item \textbf{27 Feb 2026} (\textit{Sprint 0 / Sprint 1}) - \textbf{Demo / feedback}: Team presented current progress. Feedback: define project-wide tasks/requirements and assign them to sprints; improve Scrum ceremonies/logs
+\item \textbf{3 Mar 2026} (\textit{Sprint 1}) - \textbf{Supervisor/status meeting}: Team gave short status updates: user diagram, domain model UML, requirements, component diagram, sequence diagram, Scrum update
+\item \textbf{4 Mar 2026} (\textit{Sprint 1}) - \textbf{Scrum process setup}: Team created group agreement and discussed ceremony schedule: standups, sprint planning, sprint review/retrospective
+\item \textbf{6 Mar 2026} (\textit{Sprint 1}) - \textbf{Backlog / prototype work}: Team discussed Figma and backlog continuation
+\item \textbf{9 Mar 2026} (\textit{Sprint 1}) - \textbf{Team meeting}: Team worked on diagrams and project planning
+\item \textbf{10 Mar 2026} (\textit{Sprint 1}) - \textbf{Sprint review/retro preparation}: Updates: UI prototype, requirements, sequence diagram, Confluence meeting log template, first retrospective log, group agreement, component diagram, base Avalonia file, UML class diagram, use case diagram
+\item \textbf{10 Mar 2026} (\textit{Sprint 1}) - \textbf{Retrospective}: Sprint 1 retrospective: everybody finished tasks, requirements and UML foundation were created, simple UI prototype was available
+\item \textbf{13 Mar 2026} (\textit{Sprint 1}) - \textbf{Testing practice / preparation}: Team shared xUnit example code from course exercises
+\item \textbf{16 Mar 2026} (\textit{Sprint 1 / transition}) - \textbf{Demo preparation}: Team prepared to present requirements, user stories, UML diagrams, Figma, code, retrospective notes and sequence diagram
+\item \textbf{18 Mar 2026} (\textit{Sprint 2 planning}) - \textbf{Supervisor meeting / feedback}: Alan said the plan was acceptable; team planned to assign tasks after OOP
+\item \textbf{19 Mar 2026} (\textit{Sprint 2}) - \textbf{Representative meeting}: Group representative met Amir. Main feedback: use LaTeX for report; course/project process discussion
+\item \textbf{23 Mar 2026} (\textit{Sprint 2}) - \textbf{Development progress}: SourceDataManager was available on branch/main; discussion about GitHub workflow and dependencies
+\item \textbf{24-25 Mar 2026} (\textit{Sprint 2}) - \textbf{Supervisor update}: Team reported Asset Manager and Source Data Manager were finished; next focus was UI, Optimizer, and UML update
+\item \textbf{25 Mar 2026} (\textit{Sprint 2}) - \textbf{Optimizer progress}: Net production cost code was pushed
+\item \textbf{27 Mar 2026} (\textit{Sprint 2}) - \textbf{Sprint review/retrospective}: Sprint 2 review/retro discussed completed Scenario 1 work. Retrospective: code runs well, team kept schedule; maintenance was not implemented and moved to next sprint
+\item \textbf{31 Mar 2026} (\textit{Sprint 2 / transition}) - \textbf{Supervisor meeting/status note}: Daniil wrote AssetManager, ProductionUnit, IAsset classes; Martin did SourceDataManager with Excel data; Ivan wrote optimizer core logic; Max wrote current UI; Marius worked on maintenance; another optimizer part calculated net production cost
+\item \textbf{6-7 Apr 2026} (\textit{Sprint 3}) - \textbf{Sprint planning}: Team planned Sprint 3 online. Decision: focus on unit tests for existing methods and continue UI. Each member had to add/assign own Jira story
+\item \textbf{7 Apr 2026} (\textit{Sprint 3}) - \textbf{Sprint start}: Sprint 3 started in Jira with maintenance and unit testing tasks. Scope later increased with SourceDataManager test, net production cost tests, UI and report task
+\item \textbf{7-8 Apr 2026} (\textit{Sprint 3}) - \textbf{Status update to Alan}: Team reported: tests for Scenario 1/2, net production cost tests, LaTeX report setup, AssetManager tests, UI continuation
+\item \textbf{10 Apr 2026} (\textit{Sprint 3}) - \textbf{Demo / weekly project update}: Demo with mixed online/in-person participation. Jira stories and current work were shown
+\item \textbf{13 Apr 2026} (\textit{Sprint 3}) - \textbf{Report setup meeting}: Report chapters were split: Daniil Chapter 3, Ivan Chapter 5, Edris Chapter 4 diagrams, Martin AI Usage/Chapter 1/Conclusion/Abstract, Max Chapter 4 architecture/Chapter 2, Marius Chapter 6/front matter
+\item \textbf{14 Apr 2026} (\textit{Sprint 3}) - \textbf{Testing clarification}: Team asked Alan whether tests should be one per method or include positive/negative/edge cases
+\item \textbf{16 Apr 2026} (\textit{Sprint 3}) - \textbf{Midterm presentation planning}: Team planned midterm presentation structure and split parts: problem/scope, architecture, data/UML, optimization logic, demo, results/reflection
+\item \textbf{17 Apr 2026} (\textit{Sprint 3}) - \textbf{Meeting with Alan}: Team showed presentation progress, unit testing progress and received new report template
+\item \textbf{17 Apr 2026} (\textit{Sprint 3}) - \textbf{Status update}: Daniil finished AssetManager unit testing; Martin started report repo; Marius finished Net Production Cost tests; Max worked on UI integration; Ivan finished Scenario 1/2 tests; Edris finished maintenance unit testing
+\item \textbf{19 Apr 2026} (\textit{Sprint 3}) - \textbf{Final midterm preparation}: Team refined presentation content to avoid overlap between architecture, data/UML and optimization logic. Also discussed missing Sprint 3 submission and planned Sprint 4 retro/planning after demo
+\item \textbf{20 Apr 2026} (\textit{Sprint 3 / Sprint 4}) - \textbf{Midterm evaluation}: Midterm took place. Team presented project architecture, data/UML, optimizer logic, demo, and reflection
+\item \textbf{20 Apr 2026} (\textit{Sprint 3}) - \textbf{Sprint completion}: Jira completed Sprint 3. Completed work included maintenance, unit tests, working UI, report start, net production cost with electricity prices, optimization result storage and electricity result storage
+\item \textbf{20 Apr 2026} (\textit{Sprint 4}) - \textbf{Sprint review/retro/planning}: After midterm, team did retrospective/review and Sprint 4 planning
+\item \textbf{20 Apr 2026} (\textit{Sprint 4}) - \textbf{Sprint start}: Sprint 4 started in Jira with SCRUM-98 report writing, SCRUM-111 optimization data visualization, SCRUM-114 midterm feedback implementation
+\item \textbf{24 Apr 2026} (\textit{Sprint 4}) - \textbf{Meeting with Alan}: Team showed Sprint 4 Jira plan and report template
+\item \textbf{24 Apr 2026} (\textit{Sprint 4}) - \textbf{Status update}: Daniil worked on Heat Demand graphs for Scenario 1 and 2 and Chapter 3. Max restructured UI based on demo feedback. Ivan worked on scenario graphs and technical realization.
+\item \textbf{25 Apr 2026} (\textit{Sprint 4}) - \textbf{Continued work}: Marius planned CO2 emission graph and Discussion \& Reflection part
+\item \textbf{1 May 2026} (\textit{Sprint 4}) - \textbf{Online meeting with Alan}: Team discussed Sprint 4 progress and continued coordination online due to availability issues
+\item \textbf{4 May 2026} (\textit{Sprint 5}) - \textbf{Testing discussion}: Team asked whether UI should be covered by unit tests. Alan recommended focusing more on manual, integration, and end-to-end testing for UI validation
+\item \textbf{8 May 2026} (\textit{Sprint 5}) - \textbf{Sprint planning coordination}: Team coordinated availability after exams and planned the next online meeting before Sprint Review presentation
+\item \textbf{11 May 2026} (\textit{Sprint 5}) - \textbf{Meeting with Alan}: Team received additional feedback regarding report structure, required UML diagrams, and final demo expectations
+\item \textbf{11 May 2026} (\textit{Sprint 5}) - \textbf{Sprint Review preparation}: Team discussed outdated diagrams and lack of sequence/activity diagrams before Sprint Review
+\item \textbf{15 May 2026} (\textit{Sprint 5}) - \textbf{Feedback discussion}: Team discussed whether optimization graphs should be shown during the final demo
+\item \textbf{17 May 2026} (\textit{Sprint 5}) - \textbf{Final preparation}: Team finalized integration into the main branch and discussed generating UML diagrams using Mermaid and AI assistance
+\item \textbf{18 May 2026} (\textit{Sprint 5}) - \textbf{Testing issue resolution}: Team encountered xUnit version mismatch during dotnet test execution and resolved dependency issues
+\item \textbf{18 May 2026} (\textit{Sprint 5}) - \textbf{Final demo presentation}: Team presented the final Heat Optimization System and demonstrated visualization, optimization, and UI functionality
+\item \textbf{18 May 2026} (\textit{Sprint 5}) - \textbf{Post-demo feedback review}: Team reviewed received UI and graph feedback, including electricity graphs, graph alignment, maintenance handling, and UI readability
+\end{itemize}
+\endgroup
 
 \chapter{Contracts}
 
 \section*{Supervisor Contract}
-Insert or attach the contract with the supervisor.
-
-\section*{Team Contract}
-Insert or attach the contract with the team members.
+\noindent
+\includegraphics[page=1,width=\textwidth,height=0.62\textheight,keepaspectratio]{Documents/Contracts/Student-supervisor-contract.pdf}
+\clearpage
+\thispagestyle{plain}
+\noindent
+\includegraphics[page=2,width=\textwidth,height=0.95\textheight,keepaspectratio]{Documents/Contracts/Student-supervisor-contract.pdf}
+\clearpage
+\thispagestyle{plain}
+\noindent
+\includegraphics[page=3,width=\textwidth,height=0.95\textheight,keepaspectratio]{Documents/Contracts/Student-supervisor-contract.pdf}
 
 \chapter{Code Authorship and Review}
 
-Information about who is the author and reviewer for each part of the
-code, e.g.\ classes and components.
+\begingroup
+\small
+\setlength{\parindent}{0pt}
+\begin{description}[leftmargin=0cm,style=nextline,itemsep=0.9em]
+    \item[\textbf{Ivan Rosancic}]
+    \textbf{Methods:} \texttt{RunScenario1}, \texttt{RunScenario2}, \texttt{LoadNetProductionCostGraph}, \texttt{LoadCo2Graph}, \texttt{LoadHeatDemandGraph}, \texttt{SetupNetCostAxes} \\
+    \textbf{Classes:} \texttt{Optimizer}, \texttt{ResultViewModel}
+
+    \item[\textbf{Martin Smolek}]
+    \textbf{Methods:} \texttt{LoadScenario} \\
+    \textbf{Classes:} \texttt{SourceDataManager}, \texttt{DataPoint}
+
+    \item[\textbf{Marius Cristian Para}]
+    \textbf{Methods:} \texttt{GetUnitsByNetProductionCost}, \texttt{CalculateNetProductionCost}, \texttt{LoadCo2Graph}, \texttt{BuildMaintenanceWarning}, \texttt{LoadElectricityGraph} \\
+    \textbf{Classes:} \texttt{AssetViewModel}, \texttt{ResultViewModel}, \texttt{Optimizer}
+
+    \item[\textbf{Daniil Miadzvetski}]
+    \textbf{Methods:} \texttt{LoadHeatDemandGraph} \\
+    \textbf{Classes:} \texttt{AssetManager}, \texttt{ProductionUnit}
+
+    \item[\textbf{Maxim Buciumas}]
+    \textbf{Methods:} \texttt{LoadScenario}, \texttt{HandleMaintenanceChange}, \texttt{SwitchScenario}, \texttt{PrepareOptimization}, \texttt{Navigate}, \texttt{OnFrameworkInitializationCompleted}, \texttt{ResolveSourceDataPath}, \texttt{GetUnitColor}, \texttt{BuildHeatProductionSeries}, \texttt{OnMaintenanceStartDayIndexChanged} \\
+    \textbf{Classes:} \texttt{SourceDataManager}, \texttt{AssetViewModel}, \texttt{DashboardViewModel}, \texttt{MainViewModel}, \\
+    \texttt{ResultViewModel}, \texttt{UnitConfigViewModel}
+
+    \item[\textbf{Edris Fiazi}]
+    \textbf{Methods:} \texttt{CreateMaintenanceForBoiler}, \texttt{ScheduleMaintenance}, \texttt{IsAvailable} \\
+    \textbf{Classes:} \texttt{AssetManager}, \texttt{SourceDataManager}, \texttt{ProductionUnit}
+\end{description}
+\endgroup
 
 \chapter{Other Supporting Documentation}
 
