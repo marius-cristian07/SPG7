@@ -477,7 +477,7 @@ public partial class ResultViewModel : ObservableObject
                 Name = unitName,
                 GeometrySize = 0,
                 LineSmoothness = 0.35,
-                Fill = new SolidColorPaint(color.WithAlpha(150)),
+                Fill = new SolidColorPaint(color),
                 Stroke = new SolidColorPaint(color) { StrokeThickness = 2 }
             });
         }
