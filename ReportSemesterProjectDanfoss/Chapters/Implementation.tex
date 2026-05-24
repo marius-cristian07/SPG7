@@ -111,16 +111,182 @@ This implementation ensured loose coupling between interface components and back
 % --------------------------------
 \section{Backend Implementation}
 
-Describe how the backend was implemented. Cover:
+The backend was implemented into the domain layer of the 3-layer architecture. The backend was responsible for handling optimization logic, maintenance scheduling, production unit management, and processing operational data used by the frontend UI layer.
+ 
+
+The backend structure consisted of the following classes:
 
 \begin{itemize}
-    \item Main components, classes, and responsibilities.
-    \item Handling of business logic.
-    \item API, controllers, and services (if relevant).
-    \item Data processing and validation.
-    \item Communication with the database or persistence layer
-          (if relevant).
+    \item Optimizer.cs
+    \item ProductionUnit.cs
+    \item MaintenanceCalculation.cs
+    \item MaintenancePeriod.cs
+    \item ResultDM.cs
 \end{itemize}
+
+\subsection{Backend Architecture and Responsibilities}
+
+The backend followed a layered structure where each class had a dedicated responsibility.
+
+\subsubsection{Optimizer Class}
+
+The Optimizer class was responsible for running optimization scenarios and processing operational data.
+
+Its primary responsibilities included:
+
+\begin{itemize}
+    \item Loading seasonal operational data
+    \item Managing production units
+    \item Calculating production costs
+    \item Running optimization scenarios
+    \item Generating scheduling results
+\end{itemize}
+The optimizer received operational data from the data layer through dependency injection:
+
+\begin{verbatim}
+public Optimizer(ISourceDataManager sourceDataManager,
+                 IAssetManager assetManager)
+\end{verbatim}
+\hbox{This implementation reduced coupling between system components and improved maintainability.}
+The optimizer maintained separate dictionaries for seasonal datasets:
+
+\begin{itemize}
+    \item Summer
+    \item Winter
+\end{itemize}
+Each dataset contained hourly operational values:
+
+\begin{itemize}
+    \item Heat demand
+    \item Electricity prices
+\end{itemize}
+
+\subsubsection{ProductionUnit Class}
+
+The ProductionUnit class represented individual heat production assets within the system.
+
+Each production unit contained:
+
+\begin{itemize}
+    \item Maximum heat production capacity
+    \item Electricity generation
+    \item Production costs
+    \item Energy consumption
+    \item CO$_2$ emissions
+\end{itemize}
+Availability checks were implemented using the IsAvailable() method:
+
+\begin{verbatim}
+public bool IsAvailable(DateTime time)
+\end{verbatim}
+This method ensured that units under maintenance were excluded form the optimization.
+
+\subsubsection{MaintenanceCalculation Class}
+
+\hbox{The MaintenanceCalculation class handled maintenance scheduling for production units.}
+
+The class created maintenance periods dynamically based on user-defined parameters from the frontend interface.
+
+The scheduling logic:
+
+\begin{itemize}
+    \item Located the selected production unit
+    \item Created a maintenance period
+    \item Assigned the maintenance interval to the unit
+\end{itemize}
+
+
+\subsubsection{ResultDM Class}
+
+The ResultDM class functioned as a data model for transferring optimization results between backend components and the frontend UI layer.
+
+The class stored:
+
+\begin{itemize}
+    \item Production unit information
+    \item Net production cost
+    \item Heat production values
+\end{itemize}
+
+
+\subsection{Business Logic Implementation}
+
+The backend implemented two primary optimization scenarios.
+
+\subsubsection{Scenario 1 -- Production Cost Optimization}
+
+Scenario 1 optimized heat production by production cost.
+
+The algorithm:
+
+\begin{enumerate}
+    \item Retrieved current heat demand
+    \item Filtered available production units
+    \item Sorted units by production cost
+    \item Allocated heat production sequentially
+    \item Continued until demand was satisfied
+\end{enumerate}
+
+\subsubsection{Scenario 2 -- Net Production Cost Optimization}
+
+Scenario 2 extended the optimization logic by including electricity prices into the calculation.
+
+The net production costs are calculated using:
+
+\begin{equation}
+\mathrm{Net\ Production\ Cost} =
+\mathrm{Production\ Cost} -
+\left(
+\frac{\mathrm{Electricity\ MW}}
+{\mathrm{Maximum\ Heat\ MW}}
+\times
+\mathrm{Electricity\ Price}
+\right)
+\end{equation}
+This allowed the system to prioritize units capable of generating additional economic value through electricity production.
+The implementation dynamically recalculated unit ranking for every hour based on current electricity prices.
+
+\subsection{Data Processing and Validation}
+
+The backend performed several validation and processing operations to ensure stable system behavior.
+
+Examples included:
+
+\begin{itemize}
+    \item Validation of production unit capacity
+    \item Verification of available source data
+    \item Maintenance conflict handling
+    \item Demand allocation calculations
+\end{itemize}
+
+For example, the optimizer validated heat production capacity before performing calculations:
+
+\begin{verbatim}
+if (unit.MaxHeatMW <= 0)
+{
+    throw new ArgumentException(...);
+}
+\end{verbatim}
+Similarly, the system verified that operational data existed for the requested time before running the optimization.
+
+\subsection{Communication with the Data Layer}
+
+The backend communicated with the data layer through interfaces:
+
+\begin{itemize}
+    \item ISourceDataManager
+    \item IAssetManager
+\end{itemize}
+These interfaces provided access to:
+
+\begin{itemize}
+    \item Seasonal operational datasets
+    \item Production unit configurations
+    \item Asset information
+\end{itemize}
+The actual loading of data was separated into the data layer. 
+This separation improved modularity and allowed backend optimization logic to remain independent from data layer.
+
 
 % --------------------------------
 \section{Data Management}
