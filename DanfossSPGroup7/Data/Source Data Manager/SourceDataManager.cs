@@ -9,9 +9,8 @@ namespace DanfossSPGroup7.Data
 
     public class SourceDataManager : ISourceDataManager
     {
-
-        public Dictionary<DateTime, DataPoint> summer { get; }
-        public Dictionary<DateTime, DataPoint> winter { get; }
+        public Dictionary<DateTime, DataPoint> Summer { get; }
+        public Dictionary<DateTime, DataPoint> Winter { get; }
         // Loading Data from the file
         public SourceDataManager()
         {
@@ -20,8 +19,8 @@ namespace DanfossSPGroup7.Data
             string summerPath = ResolveSourceDataPath(basePath, "SummerSourceDataSheet.csv");
             string winterPath = ResolveSourceDataPath(basePath, "WinterSourceDataSheet.csv");
 
-            summer = LoadScenario(summerPath);
-            winter = LoadScenario(winterPath);
+            Summer = LoadScenario(summerPath);
+            Winter = LoadScenario(winterPath);
         }
 
         private static string ResolveSourceDataPath(string basePath, string fileName)
@@ -38,7 +37,7 @@ namespace DanfossSPGroup7.Data
         }
 
         // Logic behind loading the Data
-        public Dictionary<DateTime, DataPoint> LoadScenario(string fileName)
+        private static Dictionary<DateTime, DataPoint> LoadScenario(string fileName)
         {
             if (!File.Exists(fileName))
                 throw new FileNotFoundException($"CSV file not found: {fileName}");

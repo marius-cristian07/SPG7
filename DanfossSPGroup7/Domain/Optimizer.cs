@@ -7,7 +7,6 @@ namespace DanfossSPGroup7.Domain
 {
     public class Optimizer
     {
-        public static Optimizer? Instance { get; private set; }
         public Dictionary<DateTime, DataPoint> Summer { get; private set; }
         public Dictionary<DateTime, DataPoint> Winter { get; private set; }
         private readonly List<ProductionUnit> _productionUnits;
@@ -15,13 +14,12 @@ namespace DanfossSPGroup7.Domain
 
         public Optimizer(ISourceDataManager sourceDataManager, IAssetManager assetManager)
         {
-            Instance = this;
-            Summer = sourceDataManager.summer;
-            Winter = sourceDataManager.winter;
+            Summer = sourceDataManager.Summer;
+            Winter = sourceDataManager.Winter;
             _productionUnits = assetManager.GetProductionUnits();
         }
 
-        public List<ResultDM> GetUnitsByNetProductionCost(DateTime dateTime, bool isSummer)
+        public List<OptimizationResult> GetUnitsByNetProductionCost(DateTime dateTime, bool isSummer)
         {
             var dict = isSummer ? Summer : Winter;
             if (!dict.TryGetValue(dateTime, out var dataPoint))
@@ -31,7 +29,7 @@ namespace DanfossSPGroup7.Domain
 
             return _productionUnits
                 .Where(u => u.IsAvailable(dateTime))
-                .Select(unit => new ResultDM
+                .Select(unit => new OptimizationResult
                 {
                     Unit = unit,
                     NetProductionCost = CalculateNetProductionCost(unit, dataPoint.ElectricityPrice)
