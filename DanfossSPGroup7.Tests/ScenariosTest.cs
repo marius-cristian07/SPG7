@@ -11,19 +11,8 @@ namespace DanfossSPGroup7.Tests
 
     public class FakeSourceDataManager : ISourceDataManager
     {
-        public Dictionary<DateTime, DataPoint> summer { get; set; } = new();
-        public Dictionary<DateTime, DataPoint> winter { get; set; } = new();
-
-        public Dictionary<DateTime, DataPoint> LoadScenario(string scenario)
-        {
-            // Return appropriate dataset based on scenario
-            return scenario.ToLower() switch
-            {
-                "summer" => summer,
-                "winter" => winter,
-                _ => new Dictionary<DateTime, DataPoint>()
-            };
-        }
+        public Dictionary<DateTime, DataPoint> Summer { get; set; } = new();
+        public Dictionary<DateTime, DataPoint> Winter { get; set; } = new();
     }
 
     public class FakeAssetManager : IAssetManager
@@ -62,7 +51,7 @@ namespace DanfossSPGroup7.Tests
 
             var source = new FakeSourceDataManager
             {
-                summer = new Dictionary<DateTime, DataPoint>
+                Summer = new Dictionary<DateTime, DataPoint>
                 {
                     { date, new DataPoint { HeatDemand = 100, ElectricityPrice = 50 } }
                 }
@@ -90,7 +79,7 @@ namespace DanfossSPGroup7.Tests
 
             var source = new FakeSourceDataManager
             {
-                summer = new Dictionary<DateTime, DataPoint>
+                Summer = new Dictionary<DateTime, DataPoint>
                 {
                     { date, new DataPoint { HeatDemand = 50, ElectricityPrice = 100 } }
                 }
@@ -119,7 +108,7 @@ namespace DanfossSPGroup7.Tests
 
             var source = new FakeSourceDataManager
             {
-                summer = new Dictionary<DateTime, DataPoint>
+                Summer = new Dictionary<DateTime, DataPoint>
                 {
                     { date, new DataPoint { HeatDemand = 0, ElectricityPrice = 50 } }
                 }
@@ -145,7 +134,7 @@ namespace DanfossSPGroup7.Tests
 
             var source = new FakeSourceDataManager
             {
-                summer = new Dictionary<DateTime, DataPoint>
+                Summer = new Dictionary<DateTime, DataPoint>
                 {
                     { date, new DataPoint { HeatDemand = 200, ElectricityPrice = 50 } }
                 }
@@ -172,7 +161,7 @@ namespace DanfossSPGroup7.Tests
 
             var source = new FakeSourceDataManager
             {
-                summer = new Dictionary<DateTime, DataPoint>
+                Summer = new Dictionary<DateTime, DataPoint>
                 {
                     { date, new DataPoint { HeatDemand = 100, ElectricityPrice = 50 } }
                 }
@@ -198,8 +187,8 @@ namespace DanfossSPGroup7.Tests
         {
             var source = new FakeSourceDataManager
             {
-                summer = new Dictionary<DateTime, DataPoint>(),
-                winter = new Dictionary<DateTime, DataPoint>()
+                Summer = new Dictionary<DateTime, DataPoint>(),
+                Winter = new Dictionary<DateTime, DataPoint>()
             };
 
             var optimizer = new Optimizer(source,
@@ -217,7 +206,7 @@ namespace DanfossSPGroup7.Tests
 
             var source = new FakeSourceDataManager
             {
-                summer = new Dictionary<DateTime, DataPoint>
+                Summer = new Dictionary<DateTime, DataPoint>
                 {
                     { date, new DataPoint { HeatDemand = 50, ElectricityPrice = 50 } }
                 }

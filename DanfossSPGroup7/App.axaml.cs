@@ -24,12 +24,11 @@ namespace DanfossSPGroup7
                 {
 
                     var dataManager = new SourceDataManager();
-
                     var assetManager = new AssetManager();
+                    var optimizer = new Optimizer(dataManager, assetManager);
+                    var mainViewModel = new MainViewModel(optimizer, assetManager);
 
-                    new Optimizer(dataManager, assetManager);
-
-                    desktop.MainWindow = new MainWindow();
+                    desktop.MainWindow = new MainWindow(mainViewModel);
                 }
 
                 base.OnFrameworkInitializationCompleted();

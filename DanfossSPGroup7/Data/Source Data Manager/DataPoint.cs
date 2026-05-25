@@ -1,5 +1,8 @@
-public class DataPoint
+namespace DanfossSPGroup7.Data
 {
-    public double HeatDemand { get; set; }
-    public double ElectricityPrice { get; set; }
+    public class DataPoint
+    {
+        public double HeatDemand { get; set; }
+        public double ElectricityPrice { get; set; }
+    }
 }

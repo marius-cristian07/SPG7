@@ -8,8 +8,7 @@ namespace DanfossSPGroup7.Data
 {
     public interface ISourceDataManager
     {
-        public Dictionary<DateTime, DataPoint> LoadScenario(string fileName);
-        public Dictionary<DateTime, DataPoint> summer { get; }
-        public Dictionary<DateTime, DataPoint> winter { get; }
+        public Dictionary<DateTime, DataPoint> Summer { get; }
+        public Dictionary<DateTime, DataPoint> Winter { get; }
     }
 }

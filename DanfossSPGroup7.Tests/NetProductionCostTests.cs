@@ -141,14 +141,12 @@ public class OptimizerTests
             Dictionary<DateTime, DataPoint> summerData,
             Dictionary<DateTime, DataPoint> winterData)
         {
-            summer = summerData;
-            winter = winterData;
+            Summer = summerData;
+            Winter = winterData;
         }
 
-        public Dictionary<DateTime, DataPoint> summer { get; }
-        public Dictionary<DateTime, DataPoint> winter { get; }
-
-        public Dictionary<DateTime, DataPoint> LoadScenario(string fileName) => new();
+        public Dictionary<DateTime, DataPoint> Summer { get; }
+        public Dictionary<DateTime, DataPoint> Winter { get; }
     }
 
     private class FakeAssetManager : IAssetManager //Returns a fixed list of units
