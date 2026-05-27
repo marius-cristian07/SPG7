@@ -125,12 +125,30 @@ Overall, the class diagram shows our final static architecture and how responsib
 % --------------------------------
 \section{Overall Technical Architecture}
 
-Present the technical structure of the solution at a high level. Cover:
+\subsection{High-Level Structure}
+The application was built using the Model-View-ViewModel (MVVM) architectural pattern because it provides a nice structure for organizing our code and makes it easy to separate the user interface from the actual code logic since our project involved both a visual dashboard and an optimization system, which helped keep the codebase manageable as it got bigger.
 
-\begin{itemize}
-    \item \textbf{Technology stack:} e.g.\ C\#, database technology,
-          UI technology.
-    \item \textbf{Separation of concerns:} views, models, and data layers.
-    \item \textbf{Architectural style:} overall architectural pattern used.
-    \item \textbf{Rationale:} reasons for the chosen structure.
-\end{itemize}
+\subsection{The Technology Stack}
+To build the application we used C\# making use of the object-oriented structure to represent the different heat production units and optimization rules in our system.
+
+For the user interface we chose Avalonia UI because it fits the MVVM design pattern perfectly and to create the graphs we used the LiveCharts2 library since a large part of the project involved presenting optimization results in a way that was easy for users to understand.
+
+For data storage since the project was based on two static CSV files, WinterSourceDataSheet.csv and SummerSourceDataSheet.csv, we read them directly into memory and because the data was fixed and did not need to be edited by users, a database would have added extra complexity without any benefits.
+
+\subsection{Separation of Concerns}
+
+To make the project easier to understand and work on as a team we devided the app into four layers: the View Layer, the ViewModel Layer, the Domain Layer, and the Data Access Layer
+
+Only the appearance of the program is controlled by the view layer as it contains files that specify UI elements including grids, buttons, sliders, date pickers, and more, like AssetView.axaml and ResultView.axaml.
+
+Data binding connects the UI to the ViewModels, like when a user clicks a butto, the ViewModel collects the input data, sends it to the backend logic and after receiving the results it updates the UI automatically.
+
+The domain layer doesn't know about the user interface and focuses just on calculations, in short being the logic of the app.
+
+The Data Layer is loads the data into the system by reading the CSV files and converting them into usable structures like lists.
+
+\subsection{Rationale for the Chosen Structure}
+
+Using this separated structure helped us reduce the dependencies between parts of the code and it also helped with working on different parts of the app at the same time while not running into problems and merge conflicts.
+
+For the data, again instead of introducing a database we simply loaded our fixed CSV files as lists when the application starts and it made things much more simple for the current scope of this project since there was no real need for a more complex solution.
