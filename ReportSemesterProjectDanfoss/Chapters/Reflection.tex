@@ -1,40 +1,47 @@
 % --------------------------------
 \section{Scrum}
 
-The first practice implemented was deciding who the Scrum Master will be, that helped us because he helped the team follow the Scrum framework, removed impediments, protected the process and coached the team. That way the process of development was easier, as we were following the structure of the ceremonies and were held accountable during the sprint.
+The first practice implemented was deciding who the Scrum Master will be, which proved to be a valuable decision, as he helped the team follow the Scrum framework, removed impediments, protected the process and coached the team. Appointing this role made the process of development easier, as the chaos was reduced, the structure of the ceremonies was followed and we were held accountable during the sprint. 
 
-The ceremonies we adopted were also useful for better code quality as well as better accountability. We always did the Sprint Planning on the first day of the Sprint, where we tried to split the workload equally and understand the goal of the Sprint. We also had one weekly standup with our supervisor, where everyone showed their progress, we fixed small tweaks, got feedback and continued the development process. The Sprint Review where we inspected the increment and adapted the Product Backlog as well as the Sprint Retrospective where we created improvement actions and reflected on the Sprint, was done on the last day of the Sprint to keep track of how we performed and what can we improve.
+The ceremonies we adopted felt like a formality at first, but they quickly became useful for better code quality as well as better accountability. We always did the Sprint Planning on the first day of the Sprint, helping us distribute work evenly and create realistic goals, however the first times we underestimated or overestimated the effort required for tasks. The weekly standup with our supervisor, where everyone showed their progress, we fixed small tweaks, got feedback and continued the development process improved our code quality and direction. The Sprint Review where we inspected the increment and adapted the Product Backlog as well as the Sprint Retrospective where we created improvement actions and reflected on the Sprint, were done on the last day of the Sprint and made our sprint noticeably smoother by assigning better amounts of work tasks  and understanding the Scrum framework better.
 
-Scrum artifacts like the Product Backlog where we had an ordered list of everything that might be needed in the product and the Sprint Backlog which were the tasks for the Sprint and using the Increment to meet the Definition of Done, helped us in knowing what tasks we have to develop, and what individual sprint was focusing on, which helped with better organizing and meeting deadlines accordingly. 
+Scrum artifacts like the Product Backlog where we had an ordered list of everything that might be needed in the product and the Sprint Backlog which were the tasks for the Sprint and using the Increment to meet the Definition of Done, helped us in knowing what tasks we have to develop, and what individual sprint was focusing on, which helped with better organizing and meeting deadlines accordingly.  
 
-Other Scrum Practices we used were that we only had a single objective for each sprint, without sudden changes that could endanger the sprint goal, keeping transparency so that artifacts were visible and understandable to everyone, as well as regular inspection paired with adaptation.
+Other Scrum Practices we used were that we only had a single objective for each sprint, without sudden changes that could endanger the sprint goal, keeping transparency so that artifacts were visible and understandable to everyone, as well as regular inspection paired with adaptation. 
 
-Some supporting practices we also used were using Story Points for User Stories for estimation, refining the Backlog and also using Task Boards with the Kanban-style visualization inside the Sprint.
+Some supporting practices we also used were using Story Points for User Stories for estimation, refining the Backlog and using Task Boards with the Kanban-style visualization inside the Sprint.
+
+Overall, implementing Scrum taught us how important rhythm and discipline is in the development of software products, ceremonies that felt resistant, made us adapt and reflect better. The lesson we learned is that the framework is not about following rituals, but adapting a mindset of improving continuously, keeping transparency and maintaining collective ownership of the product.
+
 
 
 
 % --------------------------------
 \section{Requirements Engineering}
 
-Requirements Engineering helped us during the Sprint Planning to plan and execute the work as well as to better understand the concept of the project~\cite{sommerville}. The practices and techniques made us discover, define, analyze, manage and validate user requirements to improve the efficiency and clarity of what we must do. This was a crucial part, because to fulfill the business needs of a product, the software team needs to understand the description of the service, functional and non-functional requirements to deliver the most optimal solution.
+Requirements Engineering helped us during the Sprint Planning to plan and execute the work as well as to better understand the concept of the project~\cite{sommerville}. The practices and techniques made us discover, define, analyze, manage and validate user requirements to improve the efficiency and clarity of what we must do. This was a crucial part, because to fulfill the business needs of a product, the software team needs to understand the description of the service, functional and non-functional requirements to deliver the most optimal solution. 
 
 Identifying the functional requirements benefited us by understanding system behaviors and what should it do, while the non-functional requirements informed us about the constraints we have on the system’s functionality, services and design. The process of identifying them started with the business objectives and high-level business requirements.
 
-Following the right structure of defining everything needed and then starting to develop improved efficiency, as we knew exactly what do to, in what order, and how to implement them. Only after the requirements elicitation, analysis and specification, requirements documentation and requirements validation we started to work on the design and development of the Heat Optimization application.
+Following the right structure of defining everything needed and then starting to develop improved efficiency, as we knew exactly what do to, in what order, and how to implement them. Only after the requirements elicitation, analysis and specification, requirements documentation and requirements validation we started to work on the design and development of the Heat Optimization application. 
 
 Another useful requirement engineering technique we used was creating the User Case Diagram, which helped us understand who are going to be the users of the app, and what cases each one will have to accomplish. 
 
-In this project, all requirements engineering techniques were useful and provided unique understanding for the goal we have to achieve, and we definitely consider to use them in future projects, in order to plan the development process and understand the nuances of the applications we have to build.
+Although the practices from requirements engineering bring better traceability and a rigid structure, they also added inconvenience to our inexperienced team. The ownership and continuous refinement of our Product Backlog and creating the documentation required extra effort and time, slowing down our overall development process. 
+
+In this project, all requirements engineering techniques were useful and provided unique understanding for the goal we have to achieve, and we definitely consider to use them in future projects, in order to plan the development process and understand the nuances of the applications we have to build, but optimizing the mistakes we did so the process becomes smoother.
+
 
 
 % --------------------------------
 \section{Code Refactoring}
 
-Code refactoring helped a lot in terms of upgrading the project’s code quality, as during development where multiple team members have different coding backgrounds, the code written did not always meet the cleanest standards. While updating the diagrams we noticed that some classes had too much functionality, which is bad for future scaling and performance optimizing. 
+Code refactoring helped a lot in terms of improving the project’s code quality, as during development where multiple team members have different coding backgrounds, the code written did not always meet the cleanest standards. While updating the diagrams we noticed that some classes had too much functionality, which is bad for future scaling and performance optimizing. 
 
 Refactoring also made sure that we applied Software Design Principles and learned how to use them in real coding situations, amplifying our knowledge over clean code principles. The main fixes we did during our code refactoring were, remaking repeated code into reusable functions and simplifying the code while maintaining the application functionality.
 
-Some examples of that were making a single method for loading the graphs and calling it as many times as needed with different arguments, as well as remaking the ResultViewModel class as it was handling too much functionality by splitting some parts into different files.
+Some examples of that were making a single method for loading the graphs and calling it as many times as needed with different arguments, remaking the ResultViewModel class as it was handling too much functionality by splitting some parts into different files(moving
+chart creation out of ResultViewModel and extracting UnitConfigViewModel in its own file), and removing the Optizimer singleton and creating an instance in App.axaml.cs.
 
 
 % --------------------------------
@@ -42,19 +49,22 @@ Some examples of that were making a single method for loading the graphs and cal
 
 Code reviews played an important role in our understanding of the project and how the app works. When somebody was uploading some code, we were reviewing it with all the members so everyone would comprehend the logic and the syntax of the changes. 
 
-This helped massively with improving code quality and knowledge sharing, as we all had different backgrounds of coding, someone could suggest a better solution for a problem or might have explained a more complex part of the code that someone was not understanding. This way, we were able to overcome the challenges of too complex syntax or solutions, therefore strengthening our comprehension of the code we wrote for developing the application. 
+The review sessions created the environment to clarify complex parts of code, suggesting better solutions and ideas for implementation and even catching issues early that would have costed us more time later in the project. In multiple cases, code reviews helped us solve conflicting code when more members were working on the same feature or class.
 
-Some challenges we faced were some overlapping parts in the same file or module, however when doing the code reviews, we always managed to come with solutions on how to solve them. The Sprint Retrospective also helped us with managing our code and how we divided the work, but the code reviews were crucial for completely understanding how the whole system works.
+On the other hand, we also met some challenges during the sessions. Code reviews were time-consuming and there were cases where it was making the development process longer than we expected, when a feature needed multiple fixes or some ideas were conflicting in the search of finding the best approach. As a team with different coding backgrounds, aggreging on a coding style and architecture decisions were making us spend more time than we anticipated.
+	
+Even though we experienced the drawbacks of conflicts in code and our ways of thinking combined with more time spent as initially planned, the benefits of it made us understand how important the sessions were in the long run. The collaboration of the reviews improved the code base as well as understanding the system on a deeper level. In future situations, we also plan to use them, however implanting lighter review processes in order to reduce the time spent while benefiting from the advantages of sessions
+
 
 
 % --------------------------------
 \section{Testing}
 
-In our product, we used multiple ways of testing which helped with the quality of it. Starting with the Unit Tests~\cite{xunit}~\cite{testsdk}, where we checked if the methods and functions work as intended, by isolating them in separate test files. We managed to implement tests for parts of the modules, graphs and crucial parts of the optimizer to make sure everything builds correctly. Functional testing was also used to check if each button works as intended, if we can choose the maintenance period for certain number of hours and the day, as well as switching between scenarios and seasons. Finally, end to end testing assured us that the entire flow and actions of the app work and if the system can be delivered as planned.
+In our product, we used multiple ways of testing which helped with the quality of it, by making sure all the boilers work as intended, graphs show the correct data output and the optimizer calculates the most optimal outcome. Starting with the Unit Tests ~\cite{xunit}~\cite{testsdk}, where we checked if the methods and functions for each class work as intended, by isolating them in separate test files. We managed to implement tests for all modules, graphs for both scenarios and crucial parts of the optimizer to make sure everything builds correctly. Functional testing was also used to check if each button works as intended, if we can choose the maintenance period for certain number of hours and the day, switching between tabs, as well as switching between scenarios and seasons. Finally, end to end testing assured us that the entire flow and actions of the app work and if the system can be delivered as planned.
 	
 There is a slight disadvantage with testing as it takes a generous amount of time implementing and making sure everything runs smoothly, however the benefits outweigh the drawbacks as having a system that is fully tested with code as well as manually guarantees a better product overall.
-	
-In future projects, we definitely plan to adopt testing, as the more we advance, the more complicated the products are going to be. Bigger and more complex projects mean more chances of it breaking, that is why the bigger the system the more time needs to be spent on testing and making sure every feature runs exactly how it was intended. Without testing a lot of features can break and a lot of bugs can appear out of nowhere, so spending time on testing is a high priority for every system built.
+
+In future projects, we intend to integrate testing, as the software systems become more complex, the likelihood of more defects increases. Therefore, testing that each feature functions as planned becomes essential in order to maintain the reliability of the overall system. Without strict testing, multiple undetected issues can impact the performance of the application, leading to system failure and maintenance costs increase. This experience helped us to understand that the time invested in testing is worth to deliver high-quality and more stable software systems.  
 
 
 % --------------------------------
