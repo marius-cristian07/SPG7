@@ -7,7 +7,6 @@ namespace DanfossSPGroup7.Tests
 {
     public class ProductionUnitTests
     {
-        //Positive test case
         [Fact]
         public void IsAvailable_ReturnsTrueWhenNoMaintenanceExists()
         {
@@ -22,7 +21,6 @@ namespace DanfossSPGroup7.Tests
 
             Assert.True(result);
         }
-        //Negative test case
         [Fact]
         public void IsAvailable_ReturnsFalseWhenTimeIsInsideMaintenancePeriod()
         {
@@ -42,7 +40,6 @@ namespace DanfossSPGroup7.Tests
 
             Assert.False(result);
         }
-        //Edge test case
         [Fact]
         public void IsAvailable_ReturnsTrueWhenTimeIsBeforeMaintenancePeriod()
         {
