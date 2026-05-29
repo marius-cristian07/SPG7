@@ -41,8 +41,7 @@ namespace SPG7UnitTesting
 
             Assert.NotNull(gb1);
             Assert.Equal(
-                "avares://DanfossSPGroup7/Data/AssetManager/Assets/unit1.png",
-                gb1!.ImagePath);
+                "avares://DanfossSPGroup7/Data/AssetManager/Assets/unit1.png", gb1!.ImagePath);
             Assert.Equal(3.0, gb1.MaxHeatMW);
             Assert.Equal(0, gb1.ElectricityMW);
             Assert.Equal(1.05, gb1.EnergyConsumption);
