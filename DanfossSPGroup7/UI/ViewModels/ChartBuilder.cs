@@ -17,10 +17,12 @@ namespace DanfossSPGroup7.UI.ViewModels
             IReadOnlyList<string> allowedUnitNames,
             IReadOnlyList<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)> results)
         {
+            // make one value list for each selected unit
             var distinctUnitNames = allowedUnitNames.Distinct().ToList();
             var unitHeatValues = distinctUnitNames
                 .ToDictionary(unitName => unitName, _ => new double[results.Count]);
 
+            // put the heat production for each hour into the correct unit list
             for (var i = 0; i < results.Count; i++)
             {
                 foreach (var item in results[i].Schedule)
@@ -34,6 +36,7 @@ namespace DanfossSPGroup7.UI.ViewModels
 
             var chartSeries = new List<ISeries>();
 
+            // create one stacked area series for each unit
             foreach (var unitName in distinctUnitNames)
             {
                 var color = GetUnitColor(unitName);
@@ -49,6 +52,7 @@ namespace DanfossSPGroup7.UI.ViewModels
                 });
             }
 
+            // add heat demand as a black line on top of the production areas
             var heatDemandValues = results
                 .Select(result => sourceData[result.Hour].HeatDemand)
                 .ToArray();
@@ -71,6 +75,7 @@ namespace DanfossSPGroup7.UI.ViewModels
             int scenarioNumber,
             IReadOnlyDictionary<DateTime, DataPoint> sourceData)
         {
+            // read the heat demand values in time order
             var demandValues = sourceData
                 .OrderBy(kvp => kvp.Key)
                 .Take(336)
@@ -96,6 +101,7 @@ namespace DanfossSPGroup7.UI.ViewModels
             int scenarioNumber,
             IReadOnlyList<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)> results)
         {
+            // calculate total CO2 for each hour
             var hourlyCo2 = new double[results.Count];
 
             for (var i = 0; i < results.Count; i++)
@@ -121,12 +127,14 @@ namespace DanfossSPGroup7.UI.ViewModels
             IReadOnlyDictionary<DateTime, DataPoint> sourceData,
             IReadOnlyList<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)> results)
         {
+            // calculate the average net cost for each hour
             var values = new double[results.Count];
 
             for (var i = 0; i < results.Count; i++)
             {
                 if (results[i].Schedule.Count == 0)
                 {
+                    // no production means no cost value for this hour
                     values[i] = 0;
                     continue;
                 }
@@ -137,6 +145,7 @@ namespace DanfossSPGroup7.UI.ViewModels
 
                 foreach (var item in results[i].Schedule)
                 {
+                    // weight the cost by how much heat the unit produced
                     var netCost = Optimizer.CalculateNetProductionCost(item.Unit, electricityPrice);
                     totalHeat += item.HeatMW;
                     totalCost += item.HeatMW * netCost;
@@ -166,9 +175,11 @@ namespace DanfossSPGroup7.UI.ViewModels
         {
             if (scenarioNumber != 2)
             {
+                // Electricity price is only shown for scenario 2
                 return Array.Empty<ISeries>();
             }
 
+            // read the electricity prices in time order
             var electricityValues = sourceData
                 .OrderBy(kvp => kvp.Key)
                 .Take(336)
@@ -191,6 +202,7 @@ namespace DanfossSPGroup7.UI.ViewModels
 
         private static SKColor GetUnitColor(string unitName)
         {
+            // give each unit the same chart color every time
             return unitName switch
             {
                 "GB1" => new SKColor(244, 183, 126),

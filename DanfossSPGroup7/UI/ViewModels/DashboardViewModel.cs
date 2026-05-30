@@ -10,10 +10,10 @@ public partial class DashboardViewModel : ObservableObject
 
     public DashboardViewModel(IAssetManager assetManager)
     {
-        // get all units from the data manager
+        // Get all units from the data manager
         var units = assetManager.GetProductionUnits();
 
-        // adds the units into a collection so its visible for the ui
+        // Put the units in a collection so the UI can show them
         AllUnits = new ObservableCollection<ProductionUnit>(units);
     }
 }

@@ -21,12 +21,14 @@ public partial class UnitConfigViewModel : ObservableObject
 
     public UnitConfigViewModel(ProductionUnit unit)
     {
+        // save the unit and load its picture
         Unit = unit;
         UnitImage = new Bitmap(AssetLoader.Open(new Uri(unit.ImagePath)));
     }
 
     partial void OnIsSelectedForMaintenanceChanged(bool value)
     {
+        // tell the asset page that a setting changed
         ConfigChanged?.Invoke();
     }
 
@@ -34,16 +36,19 @@ public partial class UnitConfigViewModel : ObservableObject
     {
         if (value < 0)
         {
+            // keep the last valid day if the control sends a bad value
             MaintenanceStartDayIndex = _lastValidMaintenanceStartDayIndex;
             return;
         }
 
+        // keep the day inside the allowed range
         _lastValidMaintenanceStartDayIndex = Math.Clamp(value, 0, 3);
         ConfigChanged?.Invoke();
     }
 
     partial void OnMaintenanceDurationChanged(int value)
     {
+        // tell the asset page to refresh warnings
         ConfigChanged?.Invoke();
     }
 }

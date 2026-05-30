@@ -17,7 +17,7 @@ public partial class AssetViewModel : ObservableObject
     private readonly MaintenanceCalculation _calculator = new MaintenanceCalculation();
     private readonly ObservableCollection<UnitConfigViewModel> _scenario1Configs = new();
     private readonly ObservableCollection<UnitConfigViewModel> _scenario2Configs = new();
-    [ObservableProperty] private int _selectedScenario = 1; // make the default scenario 1
+    [ObservableProperty] private int _selectedScenario = 1; // default scenario is 1
     [ObservableProperty] private ObservableCollection<UnitConfigViewModel> _displayUnits = new();
     [ObservableProperty] private string _maintenanceWarning = string.Empty;
     public IReadOnlyList<string> MaintenanceStartDayOptions { get; } =
@@ -28,8 +28,8 @@ public partial class AssetViewModel : ObservableObject
         _optimizer = optimizer;
         _assetManager = assetManager;
         var allUnits = _assetManager.GetProductionUnits();
-        // load all units so the checkboxes/maintenance slider dont reset
-        // scenario 1 config (GB1, GB2, GB3, OB1)
+        // load all units so the checkboxes and sliders do not reset
+        // create config objects for scenario 1
         var s1Names = new[] { "GB1", "GB2", "GB3", "OB1" };
         foreach (var unit in allUnits.Where(u => s1Names.Contains(u.Name)))
         {
@@ -38,11 +38,11 @@ public partial class AssetViewModel : ObservableObject
             _scenario1Configs.Add(unitConfig);
         }
 
-        // scenario 2 config (GM1, EB1, GB1, GB3)
+        // create config objects for scenario 2
         var s2Names = new[] { "GM1", "EB1", "GB1", "GB3" };
         foreach (var unit in allUnits.Where(u => s2Names.Contains(u.Name)))
         {
-            // We create NEW instances here so they are independent of Scenario 1
+            // New objects keep scenario 2 separate from scenario 1
             var unitConfig = new UnitConfigViewModel(unit);
             unitConfig.ConfigChanged += RefreshMaintenanceWarning;
             _scenario2Configs.Add(unitConfig);
@@ -53,6 +53,7 @@ public partial class AssetViewModel : ObservableObject
     [RelayCommand]
     public void SwitchScenario(string scenarioNumber)
     {    
+        // change the visible scenario from the UI
         SelectedScenario = int.Parse(scenarioNumber);
         LoadScenario(SelectedScenario);
     }
@@ -61,7 +62,7 @@ public partial class AssetViewModel : ObservableObject
     {
         SelectedScenario = scenario;
         
-        // preserve checkboxes/sliders in the list that is hidden
+        // show the config list for the selected scenario
         DisplayUnits = (scenario == 1) ? _scenario1Configs : _scenario2Configs;
         RefreshMaintenanceWarning();
     }
@@ -99,11 +100,13 @@ public partial class AssetViewModel : ObservableObject
 
     private ObservableCollection<UnitConfigViewModel> GetScenarioConfigs(int scenario)
     {
+        // get the saved config list for a scenario
         return scenario == 1 ? _scenario1Configs : _scenario2Configs;
     }
 
     private DateTime GetSourceStartDate(bool isSummer)
     {
+        // use the first date from the chosen season data
         var sourceData = isSummer ? _optimizer.Summer : _optimizer.Winter;
         if (sourceData.Count == 0)
             return new DateTime(2026, 1, 5);
@@ -113,17 +116,19 @@ public partial class AssetViewModel : ObservableObject
 
     public void PrepareOptimization(int scenario, bool isSummer)
     {
-        // reset all previous maintenance every time results are recalculated
+        // reset old maintenance before the results are recalculated
         foreach (var unit in _optimizer.ProductionUnits)
         {
             unit.ClearMaintenance();
         }
 
+        // find the units where the maintenance checkbox is selected
         var scenarioConfigs = GetScenarioConfigs(scenario);
         var selectedUnits = scenarioConfigs.Where(unit => unit.IsSelectedForMaintenance).ToList();
 
         foreach (var selectedUnit in selectedUnits)
         {
+            // turn the selected day into a real start date
             int selectedDayOffset = Math.Clamp(selectedUnit.MaintenanceStartDayIndex, 0, 3);
             DateTime startDate = GetSourceStartDate(isSummer).AddDays(selectedDayOffset);
 
@@ -140,11 +145,13 @@ public partial class AssetViewModel : ObservableObject
 
     private void RefreshMaintenanceWarning()
     {
+        // rebuild the warning text after a change
         MaintenanceWarning = BuildMaintenanceWarning(SelectedScenario);
     }
 
     private string BuildMaintenanceWarning(int scenario)
     {
+        // find all selected maintenance settings for this scenario
         var scenarioConfigs = GetScenarioConfigs(scenario).ToList();
         var selectedMaintenances = scenarioConfigs
             .Where(unit => unit.IsSelectedForMaintenance)
@@ -153,6 +160,7 @@ public partial class AssetViewModel : ObservableObject
         if (selectedMaintenances.Count == 0)
             return string.Empty;
 
+        // check both seasons because the same maintenance can affect them differently
         var seasonalWarnings = new List<string>();
         TryBuildSeasonWarning(
             _optimizer.Winter,
@@ -170,6 +178,7 @@ public partial class AssetViewModel : ObservableObject
         if (seasonalWarnings.Count == 0)
             return string.Empty;
 
+        // join all warnings into one text for the UI
         var sb = new StringBuilder("Warning: selected maintenance can leave heat demand unmet.");
         foreach (var warning in seasonalWarnings)
         {
@@ -190,6 +199,7 @@ public partial class AssetViewModel : ObservableObject
         if (sourceData.Count == 0)
             return;
 
+        // build the maintenance start and end time for each selected unit
         var seasonStart = sourceData.Keys.Min().Date;
         var maintenanceWindows = selectedMaintenances.ToDictionary(
             unit => unit.Unit.Name,
@@ -203,6 +213,7 @@ public partial class AssetViewModel : ObservableObject
         double maxShortage = 0;
         DateTime worstHour = default;
 
+        // check every hour and find the biggest heat shortage
         foreach (var hour in sourceData.OrderBy(item => item.Key))
         {
             var availableCapacity = scenarioConfigs.Sum(config =>
@@ -210,6 +221,7 @@ public partial class AssetViewModel : ObservableObject
                 if (!maintenanceWindows.TryGetValue(config.Unit.Name, out var window))
                     return config.Unit.MaxHeatMW;
 
+                // A unit gives no heat while it is in maintenance
                 var inMaintenance = hour.Key >= window.Start && hour.Key < window.End;
                 return inMaintenance ? 0 : config.Unit.MaxHeatMW;
             });
@@ -224,6 +236,7 @@ public partial class AssetViewModel : ObservableObject
 
         if (maxShortage > 0)
         {
+            // add a warning when demand is higher than available capacity
             warnings.Add(
                 $"{label}: worst shortage {maxShortage:F1} MW at {worstHour:yyyy-MM-dd HH:mm}.");
         }

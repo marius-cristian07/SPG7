@@ -11,7 +11,7 @@ namespace DanfossSPGroup7.Data
     {
         public Dictionary<DateTime, DataPoint> Summer { get; }
         public Dictionary<DateTime, DataPoint> Winter { get; }
-        // Loading Data from the file
+        // Load the summer and winter data files
         public SourceDataManager()
         {
             string basePath = AppContext.BaseDirectory;
@@ -25,10 +25,12 @@ namespace DanfossSPGroup7.Data
 
         private static string ResolveSourceDataPath(string basePath, string fileName)
         {
+            // First try to find the file next to the program
             string rootPath = Path.Combine(basePath, fileName);
             if (File.Exists(rootPath))
                 return rootPath;
 
+            // try to find the file inside the data folder
             string nestedPath = Path.Combine(basePath, "Data", "Source Data Manager", fileName);
             if (File.Exists(nestedPath))
                 return nestedPath;
@@ -36,7 +38,7 @@ namespace DanfossSPGroup7.Data
             throw new FileNotFoundException($"CSV file not found: {fileName}. Tried: {rootPath} and {nestedPath}");
         }
 
-        // Logic behind loading the Data
+        // read one CSV file and turn each row into a data point
         private static Dictionary<DateTime, DataPoint> LoadScenario(string fileName)
         {
             if (!File.Exists(fileName))
@@ -46,13 +48,14 @@ namespace DanfossSPGroup7.Data
 
             using StreamReader reader = new StreamReader(fileName);
 
-            reader.ReadLine(); // skip header
+            reader.ReadLine(); // skip the header row
 
             while (!reader.EndOfStream)
             {
                 string? line = reader.ReadLine();
                 if (string.IsNullOrWhiteSpace(line)) continue;
 
+                // each row has time heat demand and electricity price
                 string[] parts = line.Split(',');
 
                 DateTime time = DateTime.Parse(parts[0], CultureInfo.InvariantCulture);

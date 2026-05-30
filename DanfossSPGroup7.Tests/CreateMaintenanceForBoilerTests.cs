@@ -7,11 +7,11 @@ namespace DanfossSPGroup7.Tests;
 
 public class CreateMaintenanceForBoilerTests
 {
-    // positive test case
+    // test when the boiler exists
     [Fact]
     public void CreateMaintenanceForBoiler_WhenNameExistsInTheList_SetCorrectEndDate()
     {
-        // Arange
+        // Arrange
         var testUnitObj = new ProductionUnit { Name = "GB1"};
         var testUnitList = new List<ProductionUnit> { testUnitObj };
         var sut = new MaintenanceCalculation();
@@ -23,14 +23,14 @@ public class CreateMaintenanceForBoilerTests
         // Act
         sut.CreateMaintenanceForBoiler(testNameBoiler, testDuration, testUnitList, startDate);
 
-        //Assert
+        // Assert
         Assert.Equal(testEndDate, testUnitObj.MaintenancePeriods[0].End);
     }
-    // negative test case
+    // test when the boiler does not exist
     [Fact]
     public void CreateMaintenanceForBoiler_WhenNoNameExist_ThrowErrorMessage()
     {
-        // Arange
+        // Arrange
         var testUnitObj = new ProductionUnit { Name = "GB1"};
         var testUnitList = new List<ProductionUnit> { testUnitObj };
         var sut = new MaintenanceCalculation();
@@ -42,15 +42,15 @@ public class CreateMaintenanceForBoilerTests
         var exception = Assert.Throws<ArgumentException>(() =>
         sut.CreateMaintenanceForBoiler(testNameBoiler, testDuration, testUnitList, startDate));
 
-        //Assert
+        // Assert
         Assert.Equal($"Boiler '{testNameBoiler}' is not found", exception.Message);
     }
 
-    // Edge test case
+    // test when two boilers have the same name
     [Fact]
     public void CreateMaintenanceForBoiler_UnitExistTwice_FirstUnitShouldAdapt()
     {
-        // Arange
+        // Arrange
         var testUnitObj = new ProductionUnit { Name = "GB1"};
         var secoundTestObj = new ProductionUnit {Name = "GB1"};
         var testUnitList = new List<ProductionUnit> { testUnitObj, secoundTestObj };
@@ -63,7 +63,7 @@ public class CreateMaintenanceForBoilerTests
         // Act
         sut.CreateMaintenanceForBoiler(testNameBoiler, testDuration, testUnitList, startDate);
 
-        //Assert
+        // Assert
         Assert.Equal(testEndDate, testUnitObj.MaintenancePeriods[0].End);
         Assert.Empty(secoundTestObj.MaintenancePeriods);    
         }

@@ -13,8 +13,10 @@ namespace DanfossSPGroup7.Data
 
         public AssetManager()
         {
+            // points to the images inside the app resources
             const string imagePath = "avares://DanfossSPGroup7/Data/AssetManager/Assets";
             
+            // create all production units used in the project
             _units = new()
             {
                 new ProductionUnit
@@ -82,6 +84,7 @@ namespace DanfossSPGroup7.Data
 
         public List<ProductionUnit> GetProductionUnits()
         {
+            // return the same units so maintenance changes are kept
             return _units;
         }
 

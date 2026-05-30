@@ -15,7 +15,7 @@ and the development part.
         Ivan Rosancic & Chapter 5 & Optimizer Logic (Scenario 1 and 2), CO2/Net Production Cost graphs, Unit Tests for the Scenarios \\
         Martin Smolek & AI Usage, Chapter 1, Chapter 7, Abstract & SDM, CSV files configuration, created Report environment\\
         Edris Fiazi & Chapter 4 (Diagrams) & Maintenance domain and Availability checks, Unit Tests for boilers\\
-        Maxim Buciumas & Chapter 4 (Architecture), Chapter 2, References Section & Whole UI(graphs, tabs, boilers, buttons), Unit Tests for UI\\
+        Maxim Buciumas & Chapter 4 (Architecture), Chapter 2, Appendix F, References Section & Whole UI(graphs, tabs, boilers, buttons), Unit Tests for UI\\
         \bottomrule
     \end{tabular}
     \caption{Team Contribution Overview}
@@ -337,3 +337,71 @@ This appendix contains Scrum evidence materials from Jira and Confluence, includ
     \caption{Sprint 5 Retrospective evidence}
     \label{fig:sprint5-retrospective}
 \end{figure}
+
+
+% appendix f: product backlog
+\chapter{Product Backlog}
+\label{app:product_backlog}
+
+This appendix lists all the user stories and tasks that were tracked in our Jira backlog from the beginning of the project to the final sprint.
+
+\section*{Sprint 0 \& 1: Initial Setup and Architecture}
+\begin{description}
+    \item[SCRUM-1:] Create a draft how the product should look like.
+    \item[SCRUM-12:] Define three-layer architecture.
+    \item[SCRUM-13:] Define high-level UI structure.
+    \item[SCRUM-14:] Define UML class.
+    \item[SCRUM-38:] Define functional and non functional requirements.
+    \item[SCRUM-43:] Create UML Diagram.
+    \item[SCRUM-47:] Decide Tech Stack.
+    \item[SCRUM-51:] Create a UI-Prototype.
+\end{description}
+
+\section*{Sprint 2: Core Features and Scenario 1}
+\begin{description}
+    \item[SCRUM-57:] As a system, I want to store production unit parameters such as heat production, electricity production, fuel consumption and costs so that the optimizer can calculate production costs.
+    \item[SCRUM-58:] As a user, I want to view production unit information so that I understand the configuration of the heating network.
+    \item[SCRUM-62:] As a system, I want to provide winter and summer datasets so that optimization can be executed for different periods.
+    \item[SCRUM-64:] As a system, I want to calculate net production cost for each unit so that the cheapest unit is prioritized.
+    \item[SCRUM-66:] As a system, I want to consider maintenance periods so that unavailable units are excluded from optimization.
+    \item[SCRUM-79:] As a system, I want to load static Data from the excel sheet so that the optimizer can use it.
+    \item[SCRUM-82:] As a system, I want to have a optimizer component that can work with 2 scenarios based on available units.
+\end{description}
+
+\section*{Sprint 3: Unit Testing and Base UI}
+\begin{description}
+    \item[SCRUM-69:] As a system, I want to calculate net production cost including maintenance periods.
+    \item[SCRUM-70:] As a system, I want to store optimization results so that the UI can use them.
+    \item[SCRUM-71:] As a system, I want to store heat production results for each boiler.
+    \item[SCRUM-72:] As a system, I want to store electricity production and costs.
+    \item[SCRUM-89:] As a developer, I want to test the GetProductionUnits() method so that I can ensure it returns correct data.
+    \item[SCRUM-90:] As a system, I want to test RunScenario1 so that I can verify the scenario executes correctly.
+    \item[SCRUM-91:] As a system, I want to test RunScenario2 so that I can verify the scenario executes correctly.
+    \item[SCRUM-92:] As a system, I want to test the Source data manager so that I know it correctly stores the data.
+    \item[SCRUM-94:] As a system, I want to test GetUnitsByNetProductionCost and CalculateNetProductionCost so that production units are ranked correctly.
+    \item[SCRUM-95:] As a user, I want to see and have a workable UI so that I can use the app.
+    \item[SCRUM-96:] As a developer, I want to test the CreateMaintenanceForBoiler method.
+\end{description}
+
+\section*{Sprint 4 \& 5: Scenario 2 Graphs, Feedback and Final Code}
+\begin{description}
+    \item[SCRUM-97:] Create and start working on the report.
+    \item[SCRUM-98:] Writing the report.
+    \item[SCRUM-111:] As a user, I want to visualize data for the optimizations so that I can clearly see information about heat demand, emissions and costs.
+    \item[SCRUM-112:] Heat Demand - Scenario 1 graph.
+    \item[SCRUM-113:] Heat Demand - Scenario 2 graph.
+    \item[SCRUM-114:] Implementing feedback from MidTerm into the code.
+    \item[SCRUM-115:] Net production costs - Scenario 2 graph.
+    \item[SCRUM-116:] Add CO2 emissions inside Optimizer.
+    \item[SCRUM-117:] Co2 emissions - Scenario 1 graph.
+    \item[SCRUM-119:] Co2 emissions - Scenario 2 graph.
+    \item[SCRUM-120:] Restructure the UI to make it easier to use, make it easy to compare.
+    \item[SCRUM-121:] Continue writing the report.
+    \item[SCRUM-122:] As a system, I want to test the Graphs from Scenario 2 and all the Modules so that I can ensure they work correctly.
+    \item[SCRUM-123:] OPT - Optimizer component updates.
+    \item[SCRUM-124:] RDM: Results Data Manager + Maintenance connections.
+    \item[SCRUM-125:] AM: Asset Manager + Production Units tab view.
+    \item[SCRUM-126:] SDM: Source Data Manager file integrations.
+    \item[SCRUM-128:] Testing the Graphs.
+    \item[SCRUM-129:] UI Tests.
+\end{description}

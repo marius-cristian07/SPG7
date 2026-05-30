@@ -23,11 +23,13 @@ namespace DanfossSPGroup7
                 if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
                 {
 
+                    // Create the main objects used by the app
                     var dataManager = new SourceDataManager();
                     var assetManager = new AssetManager();
                     var optimizer = new Optimizer(dataManager, assetManager);
                     var mainViewModel = new MainViewModel(optimizer, assetManager);
 
+                    // Open the main window with its view model
                     desktop.MainWindow = new MainWindow(mainViewModel);
                 }
 
