@@ -1,8 +1,8 @@
-In this chapter we will present important UML diagrams we used to build our application.
+In this chapter we will present important UML diagrams to document the design of our application.
 Before we started coding, we started working on diagrams for our heating optimization application.  Our system should minimize operational expenses and satisfy the heat demand while considering electricity market and maintenance constraints. The diagrams help to structure the systems and make critical architectural design decisions. 
-Based on the Danfoss requirements, we structure our system in a modular architecture with an Asset Manager, Source Data Manager, Optimizer, Result Data Manager, and Data Visualization module to isolate the responsibilities into dedicated components. 
+Based on the requirements, we structure our system in a modular architecture with an Asset Manager, Source Data Manager, Optimizer, Result Data Manager, and Data Visualization module to isolate the responsibilities into dedicated components. 
 The use of our MVVM pattern separates UI and business logic. Furthermore, by applying the Single Responsibility Principle, we can ensure maintainability. 
-From different points of view, the architecture is shown by the package diagram, the workflow by the activity diagram, the interactions between objects by the sequence diagram, and a fixed structure by the class diagram. 
+From different points of view, the architecture is shown by the package diagram, the workflow by the activity diagram, the interactions between objects and system's components by the sequence diagram, and the internal object-oriented design and structure by the class diagram. 
 % --------------------------------
 \section{Component Diagram}
 
@@ -10,7 +10,7 @@ The component diagram shows the architectural structure of the system. Given the
 The asset manager handles static information such as the production unit, production cost, and CO$_2$ emissions. 
 The Source Data Manager contains dynamic time series data such as heat demand and electricity prices. 
 The separation of AM and SDM is split up in this way to make sure that it reduces coupling between configuration data and operational input data. Furthermore, both sources of static and dynamic data can be expanded independently. 
-The optimizer component contains the logic of optimization. This approach centralizes the business logic. The implementation also allows testing to be done separately from the user interface. The data input/output of the optimization is reduced to available production units, heat demand, electricity prices, and maintenance constraints, without knowing about charts or navigation in the UI. 
+The optimizer component contains the logic of optimization. This approach centralizes the business logic in a single component, enabling modularity. The implementation also allows testing to be done separately from the user interface. The data input/output of the optimization is reduced to available production units, heat demand, electricity prices, and maintenance constraints, without knowing about charts or navigation in the UI. 
 Both optimization scenarios are implemented as encapsulated solutions in accordance with Danfoss’s specifications. Scenario 1 prioritizes the production cost, and scenario 2 prioritizes the net production cost. 
 The Data Visualization component handles data for visualization, such as graphs. The key advantage of this design is changing the view, such as Chart Framework, without affecting the optimization logic. 
 The system operates by separating configuration data, operational input data, and optimization results into repositories to improve maintainability and data management. 
@@ -28,20 +28,19 @@ This architecture supports future decisions such as adding new production units,
 
 This chosen activity diagram highlights the entire process, from user configuration to the display of results. To put it more accurately, it models the UI workflow combined with the optimization process within the MVVM architecture. 
 This workflow shows the central use case of the system and connects scenario selection, maintenance, the optimizer, and the result view tab. 
-The workflow starts with selecting the scenario and the season and configuring the maintenance period. It continues when the user requests the optimization results.
-The Asset View Model validates the maintenance configuration and checks if the heat demand can be satisfied. If the configuration is valid, the parameters get forwarded to the MainViewModel.
-The MainViewModel navigates the requested information, such as scenario, season, and maintenance configuration, to the ResultViewModel.
-The ResultViewModel prepares the optimization parameters and applies the maintenance constraints to the production units. 
+The workflow starts with selecting the scenario and the season and configuring the maintenance period. 
+The Asset View Model validates the maintenance configuration and checks if the heat demand can be satisfied.
+When the user opens the result tab the ResultViewModel prepares the optimization parameters and applies the maintenance constraints to the production units. 
 The optimizer checks which scenario is selected and executes the correct workflow. 
 When scenario 1 is chosen, the optimizer prioritizes units based on production cost and generates a heat-only production schedule, as it performs a heat-only optimization without electricity generation or consumption. 
 In scenario 2, the optimizer performs a heat and electricity optimization by prioritizing production units based on net production cost, which depends on electricity prices and unit type, and generates a production schedule for heat and electricity operation.
 After the generation of the results, the ResultViewModel creates the report and prepares the visualization data for presentation. 
 The user can view the optimization results and charts. 
-Overall, the activity diagram visualizes the complete optimization workflow and highlights the relationship between maintenance, optimization, and result generation. 
+Overall, the activity diagram document the complete optimization workflow and highlights the relationship between maintenance, optimization, and result generation. 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Images/Diagrams/Activity Diagram.drawio.png}
+    \includegraphics[width=0.9\textwidth]{Images/Diagrams/Activity Diagram-Page-2.png}
     \caption{Activity Diagram}
     \label{fig:activity-diagram}
 \end{figure}
@@ -49,20 +48,18 @@ Overall, the activity diagram visualizes the complete optimization workflow and 
 % --------------------------------
 \section{Sequence Diagram}
 
-The sequence diagram visualizes the communication and interaction between objects in general. The selected sequence diagram models the same use case as the activity diagram from the UI interaction until the optimization and visualization. In more detail, it shows the interaction between ViewModels, the optimizer, and the generation of results. The key advantage of this sequence diagram is it shows the separation of concerns, how components communicate within the MVVM pattern. 
-The diagram contains the following participants: MainViewModel, AssetViewModel, ResultViewModel, Optimizer, ProductionUnit, ResultFormatter, and ChartBuilder. 
-The MainViewModel coordinates the navigation and creates the ResultViewModel object. 
-The AssetViewModel provides parameters such as scenario, season, and selected units and prepares them for maintenance. Furthermore, the availability of production units is checked by a loop section. 
-The ResultViewModel coordinates the optimization workflow of both scenarios, formatting, and building charts. Furthermore, an alt section that divides scenario 1 from 2 because they use different prioritization strategies. Inside each scenario is a loop section. For scenario 1, it runs a heat-only optimization, and the units get prioritized by production cost. For scenario 2, it runs a heat and electricity optimization, calculates the net production cost, and the electricity price affects the prioritization. 
-The optimizer calculates for each hour the schedule and prioritizes production units. The loop section shows an hourly calculation of the optimization period because the heat demand and electricity prices change over time. 
-The production unit checks if the units are available or under maintenance. 
-The ResultFormatter creates the text report. 
-The ChartBuilder creates chart data. 
-Overall, the sequence diagram shows how the responsibilities are separated between navigation, configuration, optimization, and formatting and visualization. Apart from the activity diagram, it focuses on communication between system objects and distribution of responsibilities. 
+
+The sequence diagram documents the communication and interaction between objects in general. The selected sequence diagram models the same use case as the activity diagram, from the user interaction in the UI to the optimization and visualization of the results. In more detail, it shows how the ViewModels coordinate the workflow, how the optimizer calculates the schedule, and how the result data is transformed into text and charts. The key advantage of this sequence diagram is that it shows the separation of concerns and how components communicate within the MVVM pattern. 
+The diagram contains the following participants: User, MainViewModel, AssetViewModel, ResultViewModel, Optimizer, ProductionUnit, ResultFormatter, and ChartBuilder. 
+The user starts the interaction by selecting the result tab, which triggers the MainViewModel navigation command. Then the MainViewModel reads the selected scenario from the AssetViewModel and requests the selected unit names from the current scenario. After that, it creates a new ResultViewModel with the selected scenario, the season, and the selected units as parameters. 
+If the AssetViewModel is available in the ResultViewModel, it prepares the optimization by applying the maintenance configuration. The ResultViewModel then calls the optimizer with the selected scenario and allowed unit names. The optimizer calculates and checks each hour each ProductionUnit for availability and maintenance constraints inside the optimization loop. 
+An alt section divides scenario 1 from scenario 2 because they use different prioritization strategies. For scenario 1, the optimizer runs a heat-only optimization and prioritizes the units by production cost. For scenario 2, the optimizer runs a heat and electricity optimization and prioritizes the units by net production cost, which depends on electricity prices and unit type. 
+After the optimization result is generated, the ResultViewModel forwards the data to the ResultFormatter for the textual report and to the ChartBuilder for the chart data. The ResultFormatter creates the report text, and the ChartBuilder creates the series for the visualizations. 
+Overall, the sequence diagram shows how the responsibilities are separated between navigation, configuration, optimization, formatting, and visualization. Apart from the activity diagram, it focuses on communication between system objects and the distribution of responsibilities. 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{Images/Diagrams/Sequence diagram.drawio.png}
+    \includegraphics[width=0.75\textwidth]{Images/Diagrams/Sequence diagram-simplified Version 2.drawio.png}
     \caption{Sequence Diagram}
     \label{fig:sequence-diagram}
 \end{figure}
@@ -70,21 +67,21 @@ Overall, the sequence diagram shows how the responsibilities are separated betwe
 % --------------------------------
 \section{Class diagram}
 The class diagram represents a static structure of our system. Especially this one shows the central classes, interfaces, attributes, methods, and relationships between classes. This version is simplified for readability. The version that implemented all classes is in the appendix.  The diagram models the architecture of our heat production optimization application. We included all the components (AM, SDM, OPT, DV, RDM), which are explained in more detail at the beginning of this chapter.  
-The asset manager component is responsible for production units, technical configuration, and maintenance. 
+The asset manager component is responsible for providing the repository of production units and their static technical properties.
 The asset manager contains the following classes:
 
-    The IAssetManager is an interface of the asset manager class, which defines access to production unit data.
+    The IAssetManager is an interface of the asset manager class, which defines access to production unit data. The reason why we used an interface for the assetmanager is, to allow diffrent asset sources
     The AssetManager class is an implemented class from the IAssetManager interface. It acts as a repository for the production units. 
     The ProductionUnit class is one of the domain classes. It represents a production unit and contains the following information: heat production, electricity production, production cost, CO$_2$ emissions, and maintenance periods. The production unit can be a gas, oil, or electric boiler or a gas motor. 
     The MaintenancePeriod class displays scheduled maintenance periods while defining start and end times. It affects the availability of the production units.
 
 The relationship between AssetManager and ProductionUnit is a one-to-many relationship because the asset manager provides many production units. 
-The ProductionUnit has a composition relationship with MaintenancePeriod, because maintenance periods belong to a specific unit.
+The ProductionUnit has a composition relationship with MaintenancePeriod. A ProductionUnit may have zero or more MaintenancePeriods and each MantenancePeriod belongs to one ProductionUnit.
 
 The source data manager manages dynamic timeseries data. 
 The source data manager contains the following classes:
 
-    The ISourceDataManager interface defines the access to the time series data. 
+    The ISourceDataManager interface defines the access to the time series data. This encapsulation enables the use of other sources in the future like api. 
     The SourceDataManager class loads the scenario data and manages the dataset of winter and summer periods. 
     The DataPoint class represents the input data for one timestamp, which contains the heat demand and electricity price. It is the foundation of the hourly optimization calculation. 
 
@@ -94,9 +91,9 @@ The optimizer contains the business logic of the system and makes, on an hourly 
 The optimizer contains the following classes:
 
     The optimizer class implements both scenarios separately. The step-by-step process of both optimizations is explained in more detail in the activity diagram.  Furthermore, it calculates the net production cost and prioritizes production units. The net production cost is fundamental for the optimizer logic. It combines production cost with electricity cost and depends dynamically on electricity prices. The optimization is done on an hourly basis. 
-    The OptimizationResult class represents the results of the optimization decisions, which contain information about production unit, net production cost, and heat production. It connects the optimizer with visualization and result storage. 
+    The OptimizationResult class is a small helper model (unit, net cost, heat) used for ranking by net production cost. Note: the scenario methods (RunScenario1, RunScenario2) return schedules as tuples (hour + per-unit allocations) which are passed to visualization and export; OptimizationResult` is not the primary output container for those scenario runs.
 
-The optimizer has a relationship to ProductionUnit and DataPoint because it is dependent on their data to run the optimization. It creates OptimizationResults objects where each result references the production unit. 
+The optimizer depends on ProductionUnit and DataPoint to run the hourly scheduling and produces per-hour schedules (tuples) consumed by the UI and export logic.
 
 The data visualization component implements UI logic of the system and is based on the MVVM architecture. 
 The data visualization contains the following classes:
@@ -110,14 +107,20 @@ The data visualization contains the following classes:
 The ResultViewModel has a relationship with the optimizer because it is dependent for calculation results on ChartBuilder for chart data and on ResultFormatter for the textual report. 
 
 The result data manager component saves the optimized results. 
-The IResultDataManager class defines the saving logic, while ResultDataManager is implementing the saving logic. In more detail, it exports the results to be stored outside the application. 
-The ResultDataManager has a relationship with OptimizationResult because it is dependent on its exports of OptimizationResults. 
+The IResultDataManager interface defines the export API and ResultDataManager provides a concrete CSV export implementation.
 
-Overall, the class diagram shows our final static architecture and how responsibilities are separated between data management, optimization, and visualization. The interfaces reduce coupling, and the MVVM pattern improves the structure of the UI. The overall structure, in particular the separation of concerns, supports maintainability, extensibility, and clear responsibility. 
+Overall, the class diagram shows our final static architecture and how responsibilities are separated between data management, optimization, and visualization. 
+
+Legend:
+Solid line with hollow triangle =  Inheritance / Generalization
+Dotted line with hollow triangle = Interface implementation / Realization
+Dotted line with standard arrow = Dependency
+Solid line with filled diamond = Composition
+Solid line without diamond = Association
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{Images/Diagrams/UML Diagram-Version 5.drawio.png}
+    \includegraphics[width=0.85\textwidth]{Images/Diagrams/UML Diagram-Version 5.png}
     \caption{Class Diagram}
     \label{fig:class-diagram}
 \end{figure}
