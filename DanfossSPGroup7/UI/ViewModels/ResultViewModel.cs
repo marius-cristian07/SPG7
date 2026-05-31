@@ -69,14 +69,17 @@ public partial class ResultViewModel : ObservableObject
     [RelayCommand]
     public void ChangeScenario(string scenarioNum)
     {
+        // save the scenario chosen from the UI
         CurrentScenario = int.Parse(scenarioNum);
 
         if (_assetPage != null)
         {
+            // use the selected units from the asset page
             _currentUnitNames = _assetPage.GetSelectedUnitNames(CurrentScenario);
         }
         else
         {
+            // use default units when there is no asset page
             _currentUnitNames = CurrentScenario == 1
                 ? new List<string> { "GB1", "GB2", "GB3", "OB1" }
                 : new List<string> { "GM1", "EB1", "GB1", "GB3" };
@@ -88,12 +91,14 @@ public partial class ResultViewModel : ObservableObject
     [RelayCommand]
     public void ChangeSeason(string isSummerStr)
     {
+        // save the season chosen from the UI
         CurrentIsSummer = bool.Parse(isSummerStr);
         LoadReport(CurrentScenario, CurrentIsSummer, _currentUnitNames);
     }
 
     partial void OnCurrentScenarioChanged(int value)
     {
+        // update buttons when the scenario changes
         IsScenario2 = value == 2;
         OnPropertyChanged(nameof(IsScenario1Selected));
         OnPropertyChanged(nameof(IsScenario2Selected));
@@ -101,17 +106,20 @@ public partial class ResultViewModel : ObservableObject
 
     partial void OnCurrentIsSummerChanged(bool value)
     {
+        // update buttons when the season changes
         OnPropertyChanged(nameof(IsWinterSelected));
         OnPropertyChanged(nameof(IsSummerSelected));
     }
 
     public void LoadReport(int scenarioNumber, bool isSummer, List<string> allowedUnitNames)
     {
+        // store the current choices so the page can refresh correctly
         CurrentScenario = scenarioNumber;
         CurrentIsSummer = isSummer;
 
         if (_assetPage != null)
         {
+            // apply maintenance and selected units before running the optimizer
             _assetPage.PrepareOptimization(scenarioNumber, isSummer);
             allowedUnitNames = _assetPage.GetSelectedUnitNames(scenarioNumber);
             _currentUnitNames = allowedUnitNames;
@@ -128,6 +136,7 @@ public partial class ResultViewModel : ObservableObject
         }
         else
         {
+            // stop if an unknown scenario is used
             ResultsText = "Invalid scenario selected.";
             Series = Array.Empty<ISeries>();
             return;
@@ -135,11 +144,13 @@ public partial class ResultViewModel : ObservableObject
 
         if (results.Count > 336)
         {
+            // show only the first two weeks of hourly data
             results = results.Take(336).ToList();
         }
 
         var sourceData = isSummer ? _optimizer.Summer : _optimizer.Winter;
 
+        // build the text report and all chart series
         ResultsText = ResultFormatter.BuildTextReport(
             scenarioNumber,
             isSummer,
@@ -155,6 +166,7 @@ public partial class ResultViewModel : ObservableObject
 
     private void SetupAxes()
     {
+        // create the axes used by all charts
         (XAxes, YAxes) = CreateTimeAxes("Heat Production (MW)", value => $"{value:F1}");
         XAxes[0].Labeler = BuildDayDateLabel;
 
@@ -173,6 +185,7 @@ public partial class ResultViewModel : ObservableObject
 
     private static (Axis[] xAxes, Axis[] yAxes) CreateTimeAxes(string yName, Func<double, string> yLabeler)
     {
+        // create one time axis and one value axis
         var xAxes = new Axis[]
         {
             new Axis
@@ -198,15 +211,18 @@ public partial class ResultViewModel : ObservableObject
 
     private string BuildDayDateLabel(double value)
     {
+        // convert an hour number into a day label
         var dayIndex = (int)value / 24;
         var dayNumber = dayIndex + 1;
 
         var sourceData = CurrentIsSummer ? _optimizer.Summer : _optimizer.Winter;
         if (sourceData.Count == 0)
         {
+            // use a simple label when no source data exists
             return $"Day {dayNumber}";
         }
 
+        // show the day number together with the real date
         var startDate = sourceData.Keys.Min().Date;
         var dayDate = startDate.AddDays(dayIndex);
         return $"Day {dayNumber}\r\n({dayDate:dd/MM})";

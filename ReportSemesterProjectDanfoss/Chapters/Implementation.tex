@@ -4,54 +4,31 @@
 \section{Frontend Implementation}
 
 The frontend was implemented in the UI layer using the Avalonia UI frameworks together with the MVVM (Model--View--ViewModel) architecture.  
-The implementation focused on separating the UI layer from the Domain layer and Data layer in order to improve scalability and code readability. 
+The implementation focused on separating the UI layer from the Domain layer and Data layer.
 
 \subsection{Frontend Architecture}
 
-The frontend was structured into multiple ViewModels and Views:
-
-
-\begin{itemize}
-    \item MainViewModel.cs (MainWindow.axaml)
-    \item AssetViewModel.cs (AssetView.axaml)
-    \item DashboardViewModel.cs (DashboardView.axaml)
-    \item ResultViewModel.cs (ResultView.axaml)
-    \item UnitConfigViewModel.cs
-    \item ChartBuilder.cs
-\end{itemize}
+The frontend was structured into multiple ViewModels and Views: MainViewModel.cs (MainWindow.axaml), AssetViewModel.cs (AssetView.axaml), DashboardViewModel.cs (DashboardView.axaml), ResultViewModel.cs (ResultView.axaml), UnitConfigViewModel.cs and ChartBuilder.cs.
 
 
 
 \subsection{Main Navigation and View Handling}
 
 The MainViewModel was used as the center for navigation between different pages of the application. 
-The ViewModel has a CurrentViewModel property which determined which page was displayed in the main content area. When the user selected a different tab in the navigation menu the Navigate() method updated the active ViewModel.
-The tabs were stored using the currently selected tab through the SelectedTab property. 
+The ViewModel has a CurrentViewModel property which determined which page was displayed in the main content area. When the user selects a different tab in the navigation menu the Navigate() method updated the active ViewModel.
 
 
 \subsection{Asset Management Interface}
 
 
-The Asset Management page was implemented to allow users to:
+The Asset Management page was implemented to allow users to see details of production units, change between scenaios and put units into maintenance.
 
-\begin{itemize}
-    \item See details of production units
-    \item Change between scenaios 
-    \item Put units into maintenance
-\end{itemize}
 The page logic was implemented inside the AssetViewModel.  
 Each production unit had its own separate UnitConfigViewModel which stored unit specific information such as maintenance and its duration.
-
-\noindent \newline Two independent configuration were implemented:
-
-\begin{itemize}
-    \item \_scenario1Configs
-    \item \_scenario2Configs
-\end{itemize}
+Two independent configuration were implemented \_scenario1Configs and \_scenario2Configs.
 This was added so that changes made in one scenario did not affect the other scenario.  
 
-
-\noindent \newline A maintenance check was implemented through the RefreshMaintenanceWarning() method.
+ A maintenance check was implemented through the RefreshMaintenanceWarning() method.
 Which calculated whether selected maintenance schedules could cause less heat compared to heat demand.
 If maintenance risked creating less heat then needed a warning message was displayed to the user.  
 
@@ -67,25 +44,11 @@ The Data page provided users with a overview of system information and operation
 The Result page is used to visualize the optimization output.
 The page logic was implemented in the ResultViewModel while the graph generation was separated into the ChartBuilder class.
 
-\noindent \newline The interface included:
+The interface included scenario selection buttons, Winter/Summer selection buttons, graphs for the optimization, graph legends and time labels.
 
-\begin{itemize}
-    \item Scenario selection buttons
-    \item Winter/Summer selection buttons
-    \item Graphs for the optimization
-    \item Graph legends
-    \item Time labels
-\end{itemize}
-Implemented graphs:
+Implemented graphs: heat production, heat demand, CO$_2$ emissions, net production cost and electricity price(For Scenario 2).
 
-\begin{itemize}
-    \item Heat production
-    \item Heat demand
-    \item CO$_2$ emissions
-    \item Net production cost
-    \item Electricity price (For Scenario 2)
-\end{itemize} 
-The heat production graph used stacked area charts to clearly tell apart production contributions from different units.  
+The heat production graph used stacked area charts to tell apart production contributions from different units.  
 To improve readability individual units were assigned colors and all graphs shared axis configuration methods.  
 The graphs dynamically updated whenever the user changed scenarios or season selection.
 
@@ -95,35 +58,10 @@ The graphs dynamically updated whenever the user changed scenarios or season sel
 
 \subsection{Communication Between Frontend and Backend}
 
-The frontend communicated with backend through the ViewModels. The UI itself did not perform the optimization instead it sent information the user selected to the backend.
+The frontend communicated with backend through the ViewModels. 
+The MainViewModel passed the selected scenario,  season, production units and maintenance configurations into the ResultViewModel constructor.
 
-\noindent \newline When the user navigated to the Result page, the MainViewModel collected:
 
-\begin{itemize}
-    \item Selected scenario
-    \item Selected season
-    \item Selected production units
-    \item Maintenance configurations
-\end{itemize}
-
-\noindent \newline These values were then passed into the ResultViewModel constructor:
-
-\begin{verbatim}
-CurrentViewModel = new ResultViewModel(
-    _optimizer,
-    AssetPage,
-    scenario,
-    isSummer,
-    selectedUnits
-);
-\end{verbatim}
-
-\noindent \newline The ResultViewModel then called the backend optimization methods:
-
-\begin{itemize}
-    \item RunScenario1()
-    \item RunScenario2()
-\end{itemize}
 
 
 
@@ -132,16 +70,7 @@ CurrentViewModel = new ResultViewModel(
 
 The backend was implemented into the Domain layer of the 3-layer architecture. The backend was responsible for handling optimization logic, maintenance scheduling, production unit management, and processing of operational data used by the UI layer.
 
-\noindent \newline The backend consisted of the following classes:
-
-\begin{itemize}
-    \item Optimizer.cs
-    \item ProductionUnit.cs
-    \item MaintenanceCalculation.cs
-    \item MaintenancePeriod.cs
-    \item OptimizationResult.cs
-    \item ResultFormatter.cs
-\end{itemize}
+Backend consisted of the following classes Optimizer.cs, ProductionUnit.cs, MaintenanceCalculation.cs, MaintenancePeriod.cs, OptimizationResult.cs and ResultFormatter.cs.
 
 \subsection{Backend Architecture}
 
@@ -149,48 +78,24 @@ The backend was implemented into the Domain layer of the 3-layer architecture. T
 \subsubsection{Optimizer Class}
 
 The Optimizer class was used for running optimization scenarios and processing data.
+Its responsibilities included loading seasonal data, calculating production costs, running optimization scenarios and generating optimization results.
 
-\noindent \newline Its responsibilities included:
-
-\begin{itemize}
-    \item Loading seasonal data
-    \item Calculating production costs
-    \item Running optimization scenarios
-    \item Generating optimization results
-\end{itemize}
-The optimizer received data from the Data layer through a dependency injection:
+\noindent \newline The optimizer received data from the Data layer through a dependency injection:
 
 \begin{verbatim}
 public Optimizer(ISourceDataManager sourceDataManager,
                  IAssetManager assetManager)
 \end{verbatim}
-The optimizer maintained separate dictionaries for seasonal datasets:
+The optimizer maintained separate dictionaries for Summer and Winter.
 
-\begin{itemize}
-    \item Summer
-    \item Winter
-\end{itemize}
-Each dataset contained hourly operational data:
 
-\begin{itemize}
-    \item Heat demand
-    \item Electricity prices
-\end{itemize}
 
 \subsubsection{ProductionUnit Class}
 
-The ProductionUnit class represented individual heat production units.
+The ProductionUnit class implemented individual heat production units.
+Each production unit contained maximum heat production capacity, electricity generation, production costs, energy consumption and CO$_2$ emissions.
 
-\noindent \newline Each production unit contained:
-
-\begin{itemize}
-    \item Maximum heat production capacity
-    \item Electricity generation
-    \item Production costs
-    \item Energy consumption
-    \item CO$_2$ emissions
-\end{itemize}
-Availability checks were implemented using the IsAvailable() method:
+\noindent \newline Availability check was implemented:
 
 \begin{verbatim}
 public bool IsAvailable(DateTime time)
@@ -199,57 +104,32 @@ This method made sure that units under maintenance were excluded form the optimi
 
 \subsubsection{MaintenanceCalculation Class}
 
-\hbox{The MaintenanceCalculation class was used for scheduling maintenance for production units.}
+\hbox{The MaintenanceCalculation class was used for handling maintenance for production units.}
 
 The class created maintenance periods based on the users choices.
-
-\noindent \newline The scheduling logic:
-
-\begin{itemize}
-    \item Located the selected production unit
-    \item Created a maintenance period
-    \item Assigned the maintenance interval to the unit
-\end{itemize}
+MaintenanceCalculation class located the selected production unit then created a maintenance period and assigned the maintenance period to the unit.
 
 
 \subsubsection{ResultFormatter Class}
 
-The ResultFormatter class was used for generating optimization reports.
-
-\noindent \newline The implementation formatted optimization results into summaries that included:
-
-\begin{itemize}
-    \item Selected optimization scenario
-    \item Seasonal configuration
-    \item Maintenance schedules
-    \item Hourly production schedules
-\end{itemize}
-
+The ResultFormatter class was used for generating summerized optimization results.
+The implementation formatted optimization results into summaries that included the selected optimization scenario, seasonal configuration, maintenance schedules and hourly production schedules.
 
 
 \subsection{Business Logic Implementation}
 
-The backend implemented two primary optimization scenarios.
+Two optimization scenarios were implemented.
 
 \subsubsection{Scenario 1 -- Production Cost Optimization}
 
 Scenario 1 optimized heat production by production cost.
-
-\noindent \newline Optimization logic:
-
-\begin{enumerate}
-    \item Retrieved current heat demand
-    \item Filtered available production units
-    \item Sorted units by production cost
-    \item Allocated heat production sequentially
-    \item Continued until demand was satisfied
-\end{enumerate}
+The optimizer first checked production units for maintenance then it sorted the units by production cost after which it allocated heat production sequentially and continued until heat demand was satisfied.
 
 \subsubsection{Scenario 2 -- Net Production Cost Optimization}
 
 Scenario 2 extended the optimization logic by including electricity prices.
 
-\noindent \newline The net production costs are calculated using:
+\noindent \newline The net production costs are calculated with this formula:
 
 \begin{equation}
 \mathrm{Net\ Production\ Cost} =
@@ -261,19 +141,15 @@ Scenario 2 extended the optimization logic by including electricity prices.
 \mathrm{Electricity\ Price}
 \right)
 \end{equation}
-This allowed the units that generated value through electricity to be prioritized. The unit rankings were updated every hour using the current electricity prices.
+This allowed the units that generated electricity to be prioritized. Unit rankings were updated every hour using the current electricity prices.
 
 \subsection{Exception handling}
 
 Exception handling was implemented to make sure the optimization can run.
+Implemented exceptions include checking if the production unit had a MaxHeatMW and whether or not source data exist for a given time.
 
-\noindent \newline Implemented Exceptions:
 
-\begin{itemize}
-    \item Production unit capacity
-    \item Dose the source data exist for a given time
-\end{itemize}
-If the production unit did not have MaxHeatMW an exception was thrown:
+\noindent \newline If the production unit did not have MaxHeatMW an exception was thrown:
 
 \begin{verbatim}
 if (unit.MaxHeatMW <= 0)
@@ -285,20 +161,9 @@ if (unit.MaxHeatMW <= 0)
 
 \subsection{Communication with the Data Layer}
 
-The backend communicated with the Data layer through interfaces:
-
-\begin{itemize}
-    \item ISourceDataManager
-    \item IAssetManager
-\end{itemize}
-These interfaces provided access to:
-
-\begin{itemize}
-    \item Seasonal operational datasets
-    \item Production unit information
-\end{itemize}
-The actual loading of data was in the Data layer. 
-This allowed the optimization logic to remain independent from data layer.
+The backend communicated with the Data layer through interfaces ISourceDataManager and IAssetManager.
+They provided access to seasonal dictionaries and production unit information.
+The loading of data was separated into the Data layer. 
 
 
 % --------------------------------
@@ -306,65 +171,35 @@ This allowed the optimization logic to remain independent from data layer.
 
 The data management was implemented into the Data layer of the 3-layer architecture. It was used for managing operational data, production unit configurations and communication between the backend and external data.
 
-
-\noindent \newline The Data layer was split into three primary components:
-
-\begin{itemize}
-    \item Asset Manager
-    \item Source Data Manager
-    \item Result Data Manager
-\end{itemize}
-
+The Data layer was split into three primary components the Asset Manager, Source Data Manager and Result Data Manager.
 
 \subsection{Data Layer Structure}
 
-The Data layer consisted of the following main classes and interfaces:
-
-\begin{itemize}
-    \item AssetManager.cs
-    \item IAssetManager.cs
-    \item SourceDataManager.cs
-    \item ISourceDataManager.cs
-    \item ResultDataManager.cs
-    \item IResultDataManager.cs
-    \item DataPoint.cs
-\end{itemize}
-The layer also included external CSV files:
-
-\begin{itemize}
-    \item SummerSourceDataSheet.csv
-    \item WinterSourceDataSheet.csv
-\end{itemize}
+The Data layer consisted of the following classes and interfaces AssetManager.cs, IAssetManager.cs, SourceDataManager.cs, ISourceDataManager.cs, ResultDataManager.cs, IResultDataManager.cs and DataPoint.cs.
+This layer also included external CSV files SummerSourceDataSheet.csv and WinterSourceDataSheet.csv.
 
 
 \subsection{Asset Manager}
 
 The AssetManager class was used for implementation of production unit information.
 It also managed a list of ProductionUnit objects.
+Each production unit contained a unit name, maximum heat production, electricity production, energy consumption, production cost, CO$_2$ emissions and image path.
 
-\noindent \newline Each production unit contained:
-
-\begin{itemize}
-    \item Unit name
-    \item Maximum heat production
-    \item Electricity production
-    \item Energy consumption
-    \item Production cost
-    \item CO$_2$ emissions
-    \item Image path
-\end{itemize}
-An example production unit implementation:
+\noindent \newline An example of production unit implementation:
 
 \begin{verbatim}
 new ProductionUnit
 {
     Name = "GB1",
+    ImagePath = $"{imagePath}/unit1.png",
     MaxHeatMW = 3.0,
+    ElectricityMW = 0,
+    EnergyConsumption = 1.05,
     ProductionCost = 510,
     CO2Emissions = 132
 }
 \end{verbatim}
-The AssetManager provided access to all production uinits through:
+The AssetManager provided access to all production units through:
 
 \begin{verbatim}
 public List<ProductionUnit> GetProductionUnits()
@@ -373,79 +208,35 @@ public List<ProductionUnit> GetProductionUnits()
 
 \subsection{Source Data Manager}
 
-The Source Data Manager was used for loading and processing of operational data from CSV files.
+The Source Data Manager was used for loading and processing of data from CSV files.
+The class loaded two dictionaries (Winter and Summer) from the CSV files. Dictionaries were implemented as "Dictionary<DateTime, DataPoint> Winter/Summer" where each timestamp was attached to a DataPoint containing heat demand and electricity price.
 
-\noindent \newline The SourceDataManager class loaded two datasets:
-
-\begin{itemize}
-    \item Summer operational data
-    \item Winter operational data
-\end{itemize}
-The datasets were stored  as dictionaries:
-
-\begin{verbatim}
-Dictionary<DateTime, DataPoint>
-\end{verbatim}
-Each timestamp was attached to a DataPoint object containing:
-
-\begin{itemize}
-    \item Heat demand
-    \item Electricity price
-\end{itemize}
-The DataPoint model was implemented as:
-
-\begin{verbatim}
-public class DataPoint
-{
-    public double HeatDemand { get; set; }
-    public double ElectricityPrice { get; set; }
-}
-\end{verbatim}
 
 
 \subsection{Result Data Manager}
 
 The Result Data Manager class was used for storing optimization results. 
+Result Data Manager stored the scenario number, seasonal configuration, time, production unit name, heat production and CO2 emissions for each hour in the optimization.
 
-\noindent \newline Stored data for each hour in the optimization:
-
-\begin{itemize}
-    \item Scenario number
-    \item Seasonal configuration
-    \item Time
-    \item Production unit name
-    \item Heat production
-    \item CO$_2$ emissions
-\end{itemize}
 
 
 \subsection{Exception handling}
 
 Exception handling was implemented to make sure data can be read.
+Implemented exception includes verifying if the CSV file exists.
 
-\noindent \newline Implemented exceptions:
 
-\begin{itemize}
-    \item Dose the CSV file exist 
-\end{itemize}
-If the file could not be found an exception was thrown:
+\noindent \newline If the file could not be found an exception was thrown:
 
 \begin{verbatim}
-throw new FileNotFoundException(...)
+if (!File.Exists(fileName))
+    throw new FileNotFoundException(...);
 \end{verbatim}
 
 
 \subsection{Communication with the Backend}
 
-The Data layer communicated with the backend through a dependency injection.
-
-\noindent \newline This allowed the backend to access:
-
-\begin{itemize}
-    \item Seasonal operational datasets
-    \item Production units
-    \item Structured optimization results
-\end{itemize}
+The Data layer communicated with the backend through a dependency injection. This allows the backend to access seasonal dictionaries, production units and structured optimization results.
 
 
 

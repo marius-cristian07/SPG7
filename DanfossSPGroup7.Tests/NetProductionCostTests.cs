@@ -37,10 +37,10 @@ public class OptimizerTests
         };
 
         var asset = new FakeAssetManager(new List<ProductionUnit> { expensiveUnit, cheapUnit });
-        var optimizer = new Optimizer(source, asset); // Creates Optimizer with fake managers
+        var optimizer = new Optimizer(source, asset); // create optimizer with fake managers
 
         var result = optimizer.GetUnitsByNetProductionCost(hour, isSummer: true);
-        // Proves normal behavior and sorting logic work
+        // check normal sorting behavior
         Assert.Equal(2, result.Count);
         Assert.Equal("Cheap", result[0].Unit.Name);
         Assert.Equal("Expensive", result[1].Unit.Name);
@@ -49,11 +49,11 @@ public class OptimizerTests
     [Fact]
     public void GetUnitsByNetProductionCost_Negative_ThrowsWhenDateIsMissing()
     {
-        var source = new FakeSourceDataManager( //Creates source data with no entries
+        var source = new FakeSourceDataManager( // create source data with no entries
             new Dictionary<DateTime, DataPoint>(),
             new Dictionary<DateTime, DataPoint>());
         var asset = new FakeAssetManager(new List<ProductionUnit>());
-        var optimizer = new Optimizer(source, asset); // Calls method with a date not in dictionary
+        var optimizer = new Optimizer(source, asset); // usea date that is not in the dictionary
 
         Assert.Throws<ArgumentException>(() =>
             optimizer.GetUnitsByNetProductionCost(new DateTime(2026, 1, 1, 8, 0, 0), isSummer: true));
@@ -62,7 +62,7 @@ public class OptimizerTests
     [Fact]
     public void GetUnitsByNetProductionCost_Edge_ReturnsEmptyWhenNoUnitsAvailable()
     {
-        // Edge behavior when data exists but all units are unavailable
+        // data exists but all units are unavailable
         var hour = new DateTime(2026, 2, 1, 12, 0, 0);
         var source = new FakeSourceDataManager(
             new Dictionary<DateTime, DataPoint>
@@ -101,7 +101,7 @@ public class OptimizerTests
         };
 
         var result = Optimizer.CalculateNetProductionCost(unit, 100);
-        //Validates expected output when all the variables are right
+        // Check the expected net cost
         Assert.Equal(50, result);
     }
 
@@ -115,7 +115,7 @@ public class OptimizerTests
             ElectricityMW = 1,
             ProductionCost = 70
         };
-        // Confirms guard clause against divide-by-zero/invalid config
+        // check that invalid max heat throws
         Assert.Throws<ArgumentException>(() => Optimizer.CalculateNetProductionCost(unit, 100));
     }
 
@@ -131,11 +131,11 @@ public class OptimizerTests
         };
 
         var result = Optimizer.CalculateNetProductionCost(unit, 0);
-        // Edge case where market price has no impact
+        // market price has no impact when it is zero
         Assert.Equal(35, result);
     }
 
-    private class FakeSourceDataManager : ISourceDataManager // Returns dictionaries you pass in
+    private class FakeSourceDataManager : ISourceDataManager // Return dictionaries from the test
     {
         public FakeSourceDataManager(
             Dictionary<DateTime, DataPoint> summerData,
@@ -149,7 +149,7 @@ public class OptimizerTests
         public Dictionary<DateTime, DataPoint> Winter { get; }
     }
 
-    private class FakeAssetManager : IAssetManager //Returns a fixed list of units
+    private class FakeAssetManager : IAssetManager // return a fixed list of units
     {
         private readonly List<ProductionUnit> _units;
 

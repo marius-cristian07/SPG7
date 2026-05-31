@@ -19,6 +19,7 @@ namespace DanfossSPGroup7.Domain
 
         public bool IsAvailable(DateTime time)
         {
+            // a unit is not available while it is in maintenance
             foreach (var maintenance in _maintenancePeriods)
             {
                 if (maintenance.Contains(time))
@@ -31,12 +32,13 @@ namespace DanfossSPGroup7.Domain
 
         public void ClearMaintenance()
         {
+            // remove old maintenance before a new calculation
             _maintenancePeriods.Clear();
         }
 
         public void ScheduleMaintenance(MaintenancePeriod period)
         {
-
+            // add the new maintenance period to this unit
             _maintenancePeriods.Add(period);
         }
     }

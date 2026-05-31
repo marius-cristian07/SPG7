@@ -15,6 +15,7 @@ namespace DanfossSPGroup7.Domain
 
         public bool Contains(DateTime time)
         {
+            // check if the time is inside the maintenance period
             return time >= Start && time < End;
         }
 

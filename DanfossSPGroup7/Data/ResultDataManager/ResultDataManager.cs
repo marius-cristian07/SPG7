@@ -15,11 +15,13 @@ namespace DanfossSPGroup7.Data
             bool isSummer,
             IReadOnlyList<(DateTime Hour, List<(ProductionUnit Unit, double HeatMW, double Co2)> Schedule)> results)
         {
+            // Build the CSV text in memory
             var csv = new StringBuilder();
             csv.AppendLine("Scenario,Season,Hour,Unit,HeatMW,Co2KgPerMWh");
 
             var season = isSummer ? "Summer" : "Winter";
 
+            // Add one row for every unit used in every hour
             foreach (var hour in results)
             {
                 foreach (var entry in hour.Schedule)
@@ -36,6 +38,7 @@ namespace DanfossSPGroup7.Data
                 }
             }
 
+            // store the last CSV so tests and other code can read it
             LastSavedCsv = csv.ToString();
             return LastSavedCsv;
         }

@@ -31,6 +31,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void Navigate(string viewName)
     {   
+        // remember the season when leaving the result page
         if (CurrentViewModel is ResultViewModel activeResultViewModel)
         {
             _lastIsSummerSelection = activeResultViewModel.CurrentIsSummer;
@@ -40,6 +41,7 @@ public partial class MainViewModel : ObservableObject
 
         if (viewName == "Result")
         {
+            // create a fresh result page with the current asset page choices
             bool isSummer = _lastIsSummerSelection;
             int scenario = AssetPage.SelectedScenario;
 
@@ -60,6 +62,7 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnSelectedTabChanged(string value)
     {
+        // Update which tab looks selected in the UI
         OnPropertyChanged(nameof(IsAssetTabSelected));
         OnPropertyChanged(nameof(IsDashboardTabSelected));
         OnPropertyChanged(nameof(IsResultTabSelected));

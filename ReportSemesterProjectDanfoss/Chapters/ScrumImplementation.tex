@@ -1,41 +1,37 @@
-\section{Scrum instead of other methods}
+\section{Scrum selection}
 
-For this project, our goal was to create a heat optimization desktop app for Danfoss that could read data sheets, calculate production costs, track emissions and optimize based on two scenarios. Building a clean solution with these requirements, required a lot of flexibility from us, thus we chose Scrum as the style for project management.
+For this project, our goal was to create a heat optimization desktop application for Danfoss that could read data sheets, calculate production costs, track emissions and optimize based on two scenarios. Although these requirements were to a great extent well-understood from the outset of the project, we had to navigate technical uncertainty and our limited experience delivering such requirements in teams. Hence, Scrum was our preferred choice, even though it was strictly mandated by the semester project course and expectations, it enabled us to deliver iteratively, reflect on our experience and limitations, and adapt as we progressed through.
 
-Before starting the development process, we looked at traditional project management styles, like the Waterfall method~\cite{sommerville}. In a Waterfall project, you need to plan out every single feature, rule, and layout detail at the start, and then follow a the plan strictly: design everything, write all the code, and test it at the very end. Its clearly somewhat of a risky approach, because there is always the risk of missing small details. A lot of times you understand how a feature should look or work once you actually start writing the code and seeing how it behaves.
-
-We already understood a lot of the core requirements from the Danfoss deliverables, but we had to learn and research the Avalonia UI framework~\cite{avalonia} completely from scratch as we went along to figure out how it worked. If we had committed to a fixed plan, discovering these visual layout challenges would have broken our timeline. Scrum allowed us to discover these technical challenges naturally during development, adjust our tasks, and focus on learning the interface framework step-by-step without interrupting the project.
-
-\section{How we broke down our time into sprints}
+\section{Sprints}
 
 We split our project timeline into a setup phase(Sprint 0), followed by five development sprints. If a sprint is too short, like one week, you spend too much time in meetings planning and reviewing instead of actually writing code. If a sprint is too long, like a month, we procrastinate because the deadline feels too far away. We kept each sprint two weeks long and found that a two-week schedule was the perfect length for our group as it gave us enough time to actually design, code, and test a working part of the app, but it was short enough to keep everyone focused and accountable.
 
-\section{Team roles and how we organized ourselves}
+\section{Team organization and roles}
 
-Because in our group we are six students, instead of trying to force a corporate hierarchy, which would have caused unnecessary friction, we adapted the roles to be fair and collaborative. We knew we needed a Scrum Master to keep our project organized and schedule our meetings, but we did not want a single student to have to do all the organizational work for the entire semester, so we rotated the role once mid-semester. One person handled the Scrum Master role for the first half of the project, and then another one for the final sprints.
+In the spirit of Agile principles, we made a conscious decision to rotate the Scrum role among team members and emphasize collaboration over strict hierarchical structures and predefined roles. For example, throughout the project, the role of the Scrum Master was assumed by two different members. Instead of locking one person into an unchangeable position for the entire semester, this rotation strategy distributed ownership across the group. The Scrum Master focused on maintaining our Jira board, tracking deadlines and organizing our examinations of the code. This approach ensured that the responsibility for managing team workflows was shared fairlyand kept our sprints moving forward efficiently.
 
-For the Product Owner role we shared the responsibility on the entire group. All six of us attended the feedback meetings and heard what Danfoss wanted and because or team is this small it didn't make sense to have only one person handle the role. When Danfoss suggested changes during our reviews like adding a CO2 emissions graph or adjusting the layout of our design, we figured out the implementation as a group and as we updated our backlog we made sure that our goals always matched what the they expected from us.
+For the Product Owner (PO) role, we decided to share its responsibilities, which enabled a shared sense of accountability for the product's features and quality. Because our student group consists of six colleagues who all interacted directly with stakeholders and supervisors, isolating a single individual as our source of requirements would have slowed down communication. Instead the feedback we received from Danfoss in the midterm evaluation was owned by all team members. For example, when requested to add a CO2 emissions tracking graph, the entire group collaborated to map out the required features. Every member took part in translating these expectations into clear backlog items.
 
 We used a volunteering approach in our meetings for asigning of the taks, where everybody volunteered based on their interests, technical strengths, and to keep everything fair, which worked really well for us and helped divide our work evenly.
 
-\section{Adapting Scrum meetings to our student schedules}
+\section{Scrum ceremonies adoption}
 
 We followed the main ideas for the four Scrum meetings (Planning, Daily Standups, Reviews, and Retrospectives) but adapted them to fit our schedules as students. Even though we all shared the same university schedule, of course everyone also had commitments outside of classes and other personal activities.
 
-Our Sprint Planning meetings took place every Monday at the start of the sprint and usually lasted around an hour. In this sessions we reviewed our backlog and agreed on what we wanted to get done next. We used story points as a simple way of estimating the effort needed to finish them, but we also relied on our own inutition of how difficult a task seemed and how much free time we had available during that sprint. Before a task could be added to the sprint board everyone needed to understand what was required and how it should be implemented.
+Our Sprint Planning meetings took place every Monday at the start of the sprint and usually lasted around an hour. In this sessions we reviewed our backlog (see Appendix \ref{app:product_backlog}) and agreed on what we wanted to get done next. We used story points as a simple way of estimating the effort needed to finish them, but we also relied on our own inutition of how difficult a task seemed and how much free time we had available during that sprint. Before a task could be added to the sprint board everyone needed to understand what was required and how it should be implemented.
 
 The Daily Scrum was the ceremony that we adapted the most. In theory Scrum suggests a short daily meeting where everyone shares updates. But for us, meeting in person every day was not the best use of our time. What we did instead was that we held one dedicated in person meeting each week to discuss progress and if any issues appeared and needed attention but for the rest of the week we stayed in contact through a WhatsApp group chat. Everyone posted updates whenever they completed a task or maybe if they ran into a problem which allowed us to stay informed without needing to meet every day and offeres us more flexibility.
 
 We also combined the Sprint Review and Sprint Retrospective into a single session that took place when the sprint ended. In the review we tested the latest version of the app together and checked if the features worked as expected. After that we discussed how the sprint had gone, what worked well and what could be improved in the next sprint.
 
-\section{Why we used Jira instead of Trello}
+\section{Jira for workflow management}
 
-When we set up the project in Sprint 0 we considered both Trello and Jira~\cite{jira}. Even though Trello was quite easy to understand and had a simple layout we thought Jira seemed better suited for a software development project because it offered more ways to organize our tasks and track the progress. One more reason is that we preferred Jira's interface because it looked nicer and the benefit of using it was that it is very used in the industry so getting some experience with it felt pretty nice for future projects, therefore it was an easy choice.
+When we set up the project in Sprint 0 we considered both Trello and Jira~\cite{jira}. Even though Trello was quite easy to understand and had a simple layout we thought Jira seemed better suited for a software development project because it offered more ways to organize our tasks and track the progress. One more reason is that we preferred Jira's interface because it is a very feature rich tool and the benefit of using it was that it is very used in the industry so getting some experience with it felt pretty nice for future projects, therefore it was an easy choice.
 
 Our setup was very simple, we organized the board into six columns that replicated how the tasks actually moved through the project:
 
 \begin{itemize}
-    \item Backlog - all of the existing tasks we have written
+    \item Backlog - all of the existing tasks we have written (a comprehensive record of these items is available in Appendix \ref{app:product_backlog})
     \item To Do - tasks we chose for this sprint but haven't been started yet
     \item In Progress - tasks that were worked on in that moment
     \item In Review - tasks that were completed and for which the team needed to review the code first
@@ -46,12 +42,12 @@ Our setup was very simple, we organized the board into six columns that replicat
 Tasks often moved quickly between the columns because we were in constant connection with the whatsapp group, but having the board available made it easy to see what still needed attention before the end of each sprint.
 
 
-\section{What we didn't do by the book and why it worked}
+\section{Delineations from Scrum recommendations}
 
 It is clear that our team did not follow Scrum exactly as it is described but we treated it as a guideline and made it fit the realities of a six person student project.
 
-A lot  project management frameworks are designed for professional development teams that work full-time but our situation was quite different and for us trying to follow every Scrum rule would probably just have added unnecessary complications without much additional value.
+Such framework is designed for professional development teams that work full-time but our situation was quite different and for us trying to follow every Scrum rule would probably just have added unnecessary complications without much additional value.
 
-Because of this we focused on the parts of Scrum that genuinely helped us work together, as we still planned our work in sprints, maintained a backlog, held regular meetings and reflected on our process, but we adapted the details to suit our needs. For example we used story points as a rough guide instead of relying on time estimates, communicated through WhatsApp instead of holding daily in person standups and combined some meetings to spend less time spent on administration.
+Because of this we focused on the parts of Scrum that genuinely helped us work together, as we still planned our work in sprints, maintained a backlog, held regular meetings and reflected on our process, but we adapted the details to suit our needs. For example we used story points as a rough guide instead of relying on time estimates, communicated through WhatsApp instead of holding daily in person standups and combined some meetings to spend less time spent on managing our collaboration. We deemed this lightweight implementation sufficient for our project and well-aligned with our academic circumstances.
 
 Overall we believe our approach was successful even if it was less formal than a classic Scrum implementation, because it was well suited to our circumstances and most importantly it helped us deliver a fully functional application that met all of the requirements provided by Danfoss.
