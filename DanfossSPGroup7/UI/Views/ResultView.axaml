@@ -64,6 +64,7 @@
                        Margin="0,8,0,10"/>
 
             <lvc:CartesianChart Grid.Row="3"
+                                TooltipFindingStrategy="CompareOnlyX"   
                                 Series="{Binding Series}"
                                 XAxes="{Binding XAxes}"
                                 YAxes="{Binding YAxes}"
@@ -77,6 +78,7 @@
                        Margin="0,20,0,10"/>
 
             <lvc:CartesianChart Grid.Row="5"
+                                TooltipFindingStrategy="CompareOnlyX" 
                                 Series="{Binding HeatDemandSeries}"
                                 XAxes="{Binding HeatDemandXAxes}"
                                 YAxes="{Binding HeatDemandYAxes}"
@@ -90,6 +92,7 @@
                        Margin="0,20,0,10"/>
 
             <lvc:CartesianChart Grid.Row="7"
+                                TooltipFindingStrategy="CompareOnlyX"   
                                 Series="{Binding Co2Series}"
                                 XAxes="{Binding Co2XAxes}"
                                 YAxes="{Binding Co2YAxes}"
@@ -103,6 +106,7 @@
                       Margin="0,20,0,10"/>
 
           <lvc:CartesianChart Grid.Row="9"
+                               TooltipFindingStrategy="CompareOnlyX" 
                                Series="{Binding NetProductionCostSeries}"
                                XAxes="{Binding NetCostXAxes}"
                                YAxes="{Binding NetCostYAxes}"
@@ -116,6 +120,7 @@
                        IsVisible="{Binding IsScenario2}"/>
 
             <lvc:CartesianChart Grid.Row="11"
+                                TooltipFindingStrategy="CompareOnlyX" 
                                 Series="{Binding ElectricitySeries}"
                                 XAxes="{Binding ElectricityXAxes}"
                                 YAxes="{Binding ElectricityYAxes}"

@@ -46,7 +46,7 @@ namespace DanfossSPGroup7.UI.ViewModels
                     Values = unitHeatValues[unitName],
                     Name = unitName,
                     GeometrySize = 0,
-                    LineSmoothness = 0.35,
+                    LineSmoothness = 0,
                     Fill = new SolidColorPaint(color),
                     Stroke = new SolidColorPaint(color) { StrokeThickness = 2 }
                 });

@@ -157,6 +157,8 @@ public partial class ResultViewModel : ObservableObject
             results,
             _optimizer.ProductionUnits);
 
+        
+
         Series = ChartBuilder.BuildHeatProductionSeries(sourceData, allowedUnitNames, results);
         HeatDemandSeries = ChartBuilder.BuildHeatDemandSeries(isSummer, scenarioNumber, sourceData);
         Co2Series = ChartBuilder.BuildCo2Series(isSummer, scenarioNumber, results);
@@ -185,25 +187,24 @@ public partial class ResultViewModel : ObservableObject
 
     private static (Axis[] xAxes, Axis[] yAxes) CreateTimeAxes(string yName, Func<double, string> yLabeler)
     {
-        // create one time axis and one value axis
         var xAxes = new Axis[]
         {
-            new Axis
-            {
-                Name = "Time",
-                UnitWidth = 24,
-                MinStep = 24,
-                ForceStepToMin = true
-            }
+        new Axis
+        {
+            Name = "Time",
+            UnitWidth = 1,           // matches actual hourly spacing of your data
+            MinStep = 24,            // label every 24 hours
+            ForceStepToMin = true
+        }
         };
 
         var yAxes = new Axis[]
         {
-            new Axis
-            {
-                Name = yName,
-                Labeler = yLabeler
-            }
+        new Axis
+        {
+            Name = yName,
+            Labeler = yLabeler
+        }
         };
 
         return (xAxes, yAxes);
